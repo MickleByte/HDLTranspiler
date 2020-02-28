@@ -1,22 +1,30 @@
 import AND from './AndGate.js';
 import XOR from './XorGate.js';
 import OR from './OrGate.js';
-import Indicator from './indicator.js'
-import Source from './source.js'
+import NOT from './NotGate.js';
+import NAND from './NandGate.js';
+import Indicator from './indicator.js';
+import Source from './source.js';
 
 export default class Menu{
-    constructor(canvWidth, canvHeight, x, y, size){
+    constructor(canvWidth, canvHeight, x, y){
+        var size = canvWidth / 5; // nuber of canvasWidth / number of menu Items * 2
         this.menuItems = [];
         this.canvHeight = canvHeight;
         this.canvWidth = canvWidth;
         this.xPos = x;
         this.yPos = y;
-        this.size = size * 2;
+        this.size = size;
+        // this.menuItems.push(new NOT(x, y, size));
+        // this.menuItems.push(new NOT(x, y, size));
+        // this.menuItems.push(new NOT(x, y, size));
+        // this.menuItems.push(new NOT(x, y, size));
         this.menuItems.push(new AND(x, y, size));
-        this.menuItems.push(new XOR(x, y, size));
-        this.menuItems.push(new OR(x, y, size));
-        this.menuItems.push(new Source(x, y, size, "IN"));
-        this.menuItems.push(new Indicator(x, y, size, "OUT"));   
+    //     this.menuItems.push(new XOR(x, y, size));
+    //     this.menuItems.push(new OR(x, y, size));
+        this.menuItems.push(new NAND(x, y, size));
+    //     this.menuItems.push(new Source(x, y, size, "IN"));
+    //     this.menuItems.push(new Indicator(x, y, size, "OUT"));   
     }
 
     draw(ctx){

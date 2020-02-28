@@ -7,9 +7,21 @@ export default class Bin extends canvasObject{
 
     draw(ctx){
         super.draw(ctx);
+
+
+
         ctx.fillStyle = "#000000";
-        ctx.font = "50px Arial";
-        ctx.fillText("BIN", this.xPos, this.yPos + this.height, this.width);
+        var fontSize = this.height * 0.9;
+        var textHeight = (this.height - fontSize);
+        fontSize = fontSize.toString();
+        var fontCommand = fontSize.concat("px Arial");
+        ctx.font = fontCommand;
+
+        var textWidth = ctx.measureText(this.nameLabel).width;
+        textWidth = (this.width - textWidth) / 2;
+
+
+        ctx.fillText("BIN", this.xPos + textWidth, this.yPos + this.height - textHeight);   
     }
 
     checkClick(x, y){

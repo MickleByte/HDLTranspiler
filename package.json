@@ -1,0 +1,23 @@
+{
+  "name": "hdltranspiler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test-unit": "node ./server/server.js",
+    "dev": "http-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MickleByte/HDLTranspiler.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MickleByte/HDLTranspiler/issues"
+  },
+  "homepage": "https://github.com/MickleByte/HDLTranspiler#readme",
+  "dependencies": {
+    "http-server": "^0.12.1"
+  }
+}

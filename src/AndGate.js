@@ -7,14 +7,6 @@ export default class AND extends Transformer{
         this.nameLabel = "&&";
     }
 
-    updateState(){
-        if (this.currentStatus){
-            this.colour = "green";
-        }
-        else{
-            this.colour = "red";
-        }
-    }
 
     simulate(){
         for (var i = 0; i < this.outputs.length; i++){
@@ -24,40 +16,37 @@ export default class AND extends Transformer{
 
 
     draw(ctx){
+
+        super.draw(ctx);
+
+
+        // drawing gate body
         ctx.fillStyle = "#fcba03"; // border colour
-        
         
         // left hand line
         ctx.beginPath();
-        ctx.moveTo(this.xPos, this.yPos);
-        ctx.lineTo(this.xPos, this.yPos + this.height);
+        ctx.moveTo(this.minBodyX, this.minBodyY);
+        ctx.lineTo(this.minBodyX, this.maxBodyY);
         ctx.stroke();
 
         // top line
         ctx.beginPath();
-        ctx.moveTo(this.xPos, this.yPos);
-        ctx.lineTo(this.xPos + (this.width * 0.6), this.yPos);
+        ctx.moveTo(this.minBodyX, this.minBodyY);
+        ctx.lineTo(this.maxBodyX - this.measure, this.minBodyY);
         ctx.stroke();
 
         // bottom line
         ctx.beginPath();
-        ctx.moveTo(this.xPos, this.yPos + this.height);
-        ctx.lineTo(this.xPos + (this.width * 0.6), this.yPos + this.height);
+        ctx.moveTo(this.minBodyX, this.maxBodyY);
+        ctx.lineTo(this.maxBodyX - this.measure, this.maxBodyY);
         ctx.stroke();
 
         // right hand arc
         ctx.beginPath();
-        ctx.arc(this.xPos + (this.width * 0.6), this.yPos + (this.height * 0.5), this.width / 2, 1.5 * Math.PI, 0.5 * Math.PI);
+        // ctx.arc(x location, y location, size, arcStart location, arcEnd location) - leave last two as 1.5*pi and 0.5*pi
+        ctx.arc(this.maxBodyX - this.measure, this.maxBodyY - ( 2 * this.measure), this.measure * 2, 1.5 * Math.PI, 0.5 * Math.PI);
         ctx.stroke();
 
-
-        // draw all inputs to transformer
-        for (var i = 0; i < this.inputs.length; i++){
-            this.inputs[i].draw(ctx);
-        }
-        // draw all outputs of transformer
-        for (var i = 0; i < this.outputs.length; i++){
-            this.outputs[i].draw(ctx);
-        }
+        
     }
 }

@@ -1,8 +1,10 @@
-import Canvas from './canvas.js';
+import Canvas from './src/canvas.js';
 
 var canvElem = document.getElementById("canvas");
-// var simBtn = document.getElementById("simulateToggle");
+var simBtn = document.getElementById("simulateToggle");
 var transBtn = document.getElementById("translateBtn");
+var save2Pallet = document.getElementById("addToPalletBtn");
+var deleteLine = document.getElementById("deleteLine");
 var offsetX = canvElem.getBoundingClientRect().left;
 var offsetY = canvElem.getBoundingClientRect().top;
 var ctx = canvElem.getContext("2d");
@@ -10,9 +12,9 @@ ctx.canvas.width  = window.innerWidth;
 ctx.canvas.height = window.innerHeight - 100;
 
 
+var myString = "from file 1";
 
-
-let myCanv = new Canvas(ctx, offsetX, offsetY);
+var myCanv = new Canvas(ctx, offsetX, offsetY);
 
 function download(filename, text) {
     var element = document.createElement('a');
@@ -42,15 +44,26 @@ window.onload = function(){
     canvElem.ondblclick = function(e){
         myCanv.dblClick(e.clientX, e.clientY)
     };
-    // simBtn.onclick = function(){
-    //     if (simBtn.innerHTML == "Stop Simulation"){
-    //         simBtn.innerHTML = "Start Simulation"
-    //     }
-    //     else{
-    //         simBtn.innerHTML = "Stop Simulation"
-    //     }
-    //     myCanv.simulate()
-    // };
+    deleteLine.onclick = function(){
+        if (canvElem.style.cursor != "crosshair"){
+            canvElem.style.cursor = "crosshair";
+            deleteLine.style.backgroundColor = "grey";
+        }
+        else{
+            canvElem.style.cursor = "auto";
+            deleteLine.style.backgroundColor = "buttonface";
+        }
+        myCanv.deleteLineBtn();
+    }
+    simBtn.onclick = function(){
+        if (simBtn.innerHTML == "Stop Simulation"){
+            simBtn.innerHTML = "Start Simulation"
+        }
+        else{
+            simBtn.innerHTML = "Stop Simulation"
+        }
+        myCanv.simulate()
+    };
     transBtn.onclick = function(){
         var moduleName = document.getElementById("moduleNameField").value;
         if (moduleName == ""){
@@ -60,6 +73,10 @@ window.onload = function(){
         
         download(moduleName + ".v", HDL);
         
+    };
+    save2Pallet.onclick = function(){
+        myCanv.save2Pallet();
     }
 }
 
+export { myCanv };

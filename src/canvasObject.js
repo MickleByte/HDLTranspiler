@@ -9,21 +9,6 @@ export default class canvasObject{
         this.colour = "#FFFFFF";
     }
 
-    getColour(){
-        var cols = [
-            "#FF005C",
-            "#fcba03",
-            "#e30bb1",
-            "#19a2d4",
-            "#0aa689"
-        ]
-        var num = Math.random() * cols.length;
-        num = Math.floor(num)
-        return cols[num];
-        
-    }
-
-
     draw(ctx, borderColour = "#000000"){
         var thickness = 1; // border thickness (in pixels)
         ctx.fillStyle = borderColour; // border colour

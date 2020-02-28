@@ -1,22 +1,24 @@
 import AND from './AndGate.js';
 import OR from './OrGate.js';
+import NOT from './NotGate.js';
 import XOR from './XorGate.js';
 import Line from './line.js';
 import Indicator from './indicator.js';
 import Source from './source.js';
-import Menu from './menu.js'
-import Bin from './bin.js'
+import Menu from './menu.js';
+import Bin from './bin.js';
+import NAND from './NandGate.js';
+
 
 export default class Canvas{
-    constructor(ctx, offsetX, offsetY){
+    constructor(ctx){
         // initialize variables
         this.simulationToggle = false;
         this.drawCtx = ctx;
         this.elements = [];
-        this.menuItems = [];
         this.width = ctx.canvas.width;
         this.height = ctx.canvas.height;
-        this.scaleFactor = 50; //this.width / 10; // scales element sizes appropriately to canvas size
+        this.scaleFactor = this.width / 25; // scales element sizes appropriately to canvas size
         this.ctx = ctx;
         this.lines = [];
         // these store the last place where the mouseDown happened - used to calc travel in mouseMove
@@ -27,14 +29,14 @@ export default class Canvas{
         // remembers if a line is currently being drawn and where it's being drawn from
         this.drawingLine = false;
         this.lineSource = [0, 0];
+
+        this.deleteLineFlag = false;
         
-        this.availableInputNames = ["A", "B", "C", "D", "E", "F", "G", "H"]
-        this.availableOutputNames = ["Z", "Y", "X", "W"]
-        this.availableInputNames.reverse();
-        this.availableOutputNames.reverse();
+        this.currentNumberOfInputs = 0;
+        this.currentNumberOfOutputs = 0;
 
         // creaton of menu
-        this.menu = new Menu(this.width, this.height, 0, 0, this.scaleFactor);
+        this.menu = new Menu(this.width, this.height, 0, 0);
 
         // creation of bin
         this.bin = new Bin(this.width - this.scaleFactor, this.height - this.scaleFactor, this.scaleFactor);
@@ -44,8 +46,40 @@ export default class Canvas{
         this.draw();
     }
 
+    generateInputName(id){
+        var inputs = ["A", "B", "C", "D", "E", "F", "G"];
+        var name = "";
+        var counter = -1;
+        while (id > inputs.length - 1){
+            id = id - inputs.length;
+            counter++;
+        }
+        if (counter != -1){
+            name = name.concat(inputs[counter]);
+        }  
+        name = name.concat(inputs[id]);
+        this.currentNumberOfInputs++;
+        return name;
+    }
+
+    generateOutputName(id){
+        var outputs = ["W", "X", "Y", "Z"];
+        var name = "";
+        var counter = -1;
+        while (id > outputs.length - 1){
+            id = id - outputs.length;
+            counter++;
+        }
+        if (counter != -1){
+            name = name.concat(outputs[counter]);
+        }  
+        name = name.concat(outputs[id]);
+        this.currentNumberOfOutputs++;
+        return name;
+    }
 
     draw(){
+
         // clear canvas
         this.clear();
 
@@ -57,10 +91,11 @@ export default class Canvas{
 
         // for each transformer call the draw function
         for (var i = 0; i < this.elements.length; i++){
-            this.elements[i].draw(this.ctx);
+            this.elements[i].draw(this.ctx, this.simulationToggle);
             for (var j = 0; j < this.elements[i].inputs.length; j++){
                 if (this.elements[i].inputs[j].source != null){
-                    this.drawLineByID([i,j], this.elements[i].inputs[j].source);
+                    var [x1, y1, x2, y2] = this.drawLineByID([i,j], this.elements[i].inputs[j].source);
+                    this.drawLine(x1, y1, x2, y2);
                 }         
             }
         }
@@ -79,7 +114,7 @@ export default class Canvas{
         var y1 = end.yPos;
         var x2 = source.xPos;
         var y2 = source.yPos;
-        this.drawLine(x1, y1, x2, y2);
+        return [x1, y1, x2, y2];
     }
 
     drawLine(x1, y1, x2, y2){
@@ -118,6 +153,9 @@ export default class Canvas{
                     case AND:
                         this.elements.push(new AND(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
                         break;
+                    case NAND:
+                        this.elements.push(new NAND(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
+                        break;
                     case OR:
                         this.elements.push(new OR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
                       break;
@@ -125,10 +163,13 @@ export default class Canvas{
                         this.elements.push(new XOR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
                         break;
                     case Indicator:
-                        this.elements.push(new Indicator(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor, this.availableOutputNames.pop()));
+                        this.elements.push(new Indicator(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor, this.generateOutputName(this.currentNumberOfOutputs)));
                         break;
                     case Source:
-                        this.elements.push(new Source(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor, this.availableInputNames.pop()));
+                        this.elements.push(new Source(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor, this.generateInputName(this.currentNumberOfInputs)));
+                        break;
+                    case NOT:
+                        this.elements.push(new NOT(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
                         break;
                     default:
                       console.log("ERROR: Could not find class to make instance of")
@@ -165,6 +206,39 @@ export default class Canvas{
                 
             }
 
+            if (this.deleteLineFlag){
+                // check if mouse move intersects one of the lines
+
+                for (var i = 0; i < this.elements.length; i++){
+                    for (var j = 0; j < this.elements[i].inputs.length; j++){
+                        if (this.elements[i].inputs[j].source != null){
+                            // var [x1, y1, x2, y2] = this.drawLineByID([i,j], this.elements[i].inputs[j].source);
+                            // var AdifX = (x2 - x1);
+                            // var AdifY = (y2 - y1);
+                            // var BdifX = (this.lastX - newX);
+                            // var BdifY = (this.lastY - newY);   
+                            // var LHS = [
+                            //     [x1 - this.lastX, AdifX, -BdifX],
+                            //     [y1 - this.lastY, AdifY, -BdifY]
+                            // ];
+                            // var RHS = [
+                            //     [0],
+                            //     [0]
+                            // ];
+                            // RHS[0][0] = -LHS[0][1];
+                            // LHS[0][1] = 0;
+
+                            // LHS[0] = LHS[0] / RHS[0][0];
+                            // RHS[0][0] = RHS[0][0] / RHS[0][0];
+                            
+
+                            // matrix[0][1] = 
+                            // console.log(matrix);
+                        }         
+                    }
+                }
+
+            }
             
             this.lastX = newX;
             this.lastY = newY;
@@ -213,13 +287,34 @@ export default class Canvas{
 
 
     dblClick(mouseX, mouseY){
-        for (var i = 0; i < this.elements.length; i++){
-            if (this.elements[i] instanceof Source){
-                if (this.elements[i].checkClick(mouseX, mouseY)){
-                    this.elements[i].updateState();
-                }        
+        if (this.simulationToggle){
+            for (var i = 0; i < this.elements.length; i++){
+                if (this.elements[i] instanceof Source){
+                    if (this.elements[i].checkClick(mouseX, mouseY)){
+                        this.elements[i].updateState();
+                    }        
+                }
             }
+            this.calcSimulation();       
         }
+        else{
+            for (var i = 0; i < this.elements.length; i++){
+                if (this.elements[i] instanceof Source || this.elements[i] instanceof Indicator){
+                    if (this.elements[i].checkClick(mouseX, mouseY)){
+                        var txt;
+                        var txt1 = prompt("Rename Node:", this.elements[i].nameLabel);
+                        if (txt1 == null || txt1 == "") {
+                            txt = this.elements[i].nameLabel;
+                        } else {
+                            txt = txt1;
+                        }
+                        this.elements[i].nameLabel = txt;
+                    }        
+                }
+            }
+           
+        }
+        this.draw();
     }
 
     clear(){
@@ -258,8 +353,9 @@ export default class Canvas{
                 assigny = "\nassign ";
                 assigny = assigny.concat(this.elements[i].nameLabel)
                 assigny = assigny.concat(" = ");
-                // find name of left root
-                var assigny = assigny.concat(this.findSource(this.elements[i]));
+                var rootNode = this.elements[i];
+                var prevNode = this.elements[rootNode.inputs[0].source[0]]
+                var assigny = assigny.concat(this.createEquation(prevNode));
                 HDL = HDL.concat(assigny);
                 HDL = HDL.concat(";");
             }
@@ -272,121 +368,130 @@ export default class Canvas{
     }
 
     isOperator(node){
-        if (node instanceof AND || node instanceof OR || node instanceof XOR){
+        if (node instanceof AND || node instanceof OR || node instanceof XOR || node instanceof NOT){
             return true;
         }
         else{
             return false;
         }
     }
+    
 
-    createEquation(tree){
+    createEquation(rootNode){
         var equation = "";
-        if (tree.inputs.length != 0){
-            if (this.isOperator(tree)){
+        if (!( rootNode instanceof Source)){
+            if (this.isOperator(rootNode)){
                 equation = equation.concat("(");
             }
-            equation = equation.concat(this.infix(this.elements[tree.inputs[0].source[0]]));
-            equation = equation.concat(tree.nameLabel);
-            this.infix(this.elements[tree.inputs[1].source[0]]);
-            if (this.isOperator(tree)){
+            if (rootNode.inputs[1] == null){
+                // if it only has 1 input (a NOT Gate)
+                equation = equation.concat(rootNode.nameLabel);
+                equation = equation.concat(this.createEquation(this.elements[rootNode.inputs[0].source[0]]));
+            }
+            else{
+                equation = equation.concat(this.createEquation(this.elements[rootNode.inputs[0].source[0]]));
+                equation = equation.concat(" ");
+                equation = equation.concat(rootNode.nameLabel);
+                equation = equation.concat(" ");
+                equation = equation.concat(this.createEquation(this.elements[rootNode.inputs[1].source[0]]));
+            }
+            
+            if (this.isOperator(rootNode)){
                 equation = equation.concat(")");
             }
         }
-        equation = equation.concat(tree.nameLabel);
+        else{
+            equation = equation.concat(rootNode.nameLabel);
+        }
         return equation;
     }
 
-    findSource(rootNode){
-        var equation = ""
-        var prevNode = this.elements[rootNode.inputs[0].source[0]]
-        
+    performCheck(LHS, operator, RHS = false,){
+        if (operator == "&&"){
+            if (LHS && RHS){
+                return true;
+            }
+            return false;
+        }
+        else if(operator == "||"){
+            if (LHS || RHS){
+                return true;
+            }
+            return false;
+        }
+        else if(operator == "^"){
+            if (LHS && RHS || !LHS && !RHS){
+                return false;
+            }
+            return true;
+        }
+        else if(operator == "~&"){
+            if (LHS && RHS){
+                return false;
+            }
+            return true;
+        }
+        else if(operator == "!"){
+            if (LHS){
+                return false;
+            }
+            return true;
+        }
+    }
 
-        if( prevNode instanceof Source){
-            equation = equation.concat(prevNode.nameLabel)
-        }
-        else{
-            equation = equation.concat(this.findSource(prevNode));
-        }
-
-        // if it is a transformer, we need the operator in the equation
-        if(this.isOperator(rootNode)){
-            equation = equation.concat(" ", rootNode.operator, " ");
-        }
-        
-        if (rootNode.inputs[1] != undefined){
-            var prevNodeRight =  this.elements[rootNode.inputs[1].source[0]]
-            if( prevNodeRight instanceof Source){
-                equation = equation.concat(prevNodeRight.nameLabel)
+    getState(rootNode){
+        var signal = false;
+        if (!( rootNode instanceof Source)){
+            if (rootNode.inputs[1] == null){
+                // if it only has 1 input (a NOT Gate)
+                var LHS = this.getState(this.elements[rootNode.inputs[0].source[0]]);
+                signal = this.performCheck(LHS, rootNode.nameLabel);
             }
             else{
-                equation = equation.concat(this.findSource(prevNodeRight));
+                var LHS = this.getState(this.elements[rootNode.inputs[0].source[0]]);
+                var RHS = this.getState(this.elements[rootNode.inputs[1].source[0]]);
+                signal = this.performCheck(LHS, rootNode.nameLabel, RHS);
             }
         }
-
-        
-        return equation;
-    }
-
-
-    translateHDL(moduleName = "halfAdder"){
-
-        this.translate2HDL();
-
-
-        // var HDL = ""; // stores the HDL output
-
-        // HDL = HDL.concat("module ");
-        // HDL = HDL.concat(moduleName);
-        // HDL = HDL.concat(" (");
-        // for(var i=0;i<this.elements.length;i++){
-        //     if (this.elements[i] instanceof Source){
-        //         HDL = HDL.concat("input ")
-        //         HDL = HDL.concat(inputNames[i]);
-        //         HDL = HDL.concat(", ");
-        //     } 
-        //     else if( this.elements[i] instanceof Indicator){
-        //         HDL = HDL.concat("output ")
-        //         HDL = HDL.concat(inputNames[i]);
-        //         HDL = HDL.concat(", ");
-        //     }
-        // }
-        // HDL = HDL.substring(0, HDL.length - 2); // remove last 2 chars from HDL string
-        // HDL = HDL.concat(");\n");
-
-        // HDL = HDL.concat("assign ");
-
-        // // operations     
-        // for(var i=0;i<this.elements.length;i++){
-        //     if( this.elements[i] instanceof Indicator){
-        //         HDL = HDL.concat(inputNames[i]);
-        //         HDL = HDL.concat(" = ");
-        //     }
-        //     else if (!(this.elements[i] instanceof Source || this.elements[i] instanceof Indicator)){
-        //         HDL = HDL.concat(this.elements[i].operator);
-        //         HDL = HDL.concat(" (");
-        //         HDL = HDL.concat("unkown, ");
-        //         for (var j=0; j < this.elements[i].inputs.length; j++){
-        //             HDL = HDL.concat(inputNames[this.elements[i].inputs[j].source[0]]);
-        //             HDL = HDL.concat(", ");
-        //         }
-        //         HDL = HDL.substring(0, HDL.length - 2); // remove last 2 chars from HDL string
-        //         HDL = HDL.concat(");\n");
-        //     }       
-        // }
-        
-        // HDL = HDL.concat("endmodule");
-
-        // console.log(HDL);
+        else{
+            signal = rootNode.currentStatus;
+        }
+        return signal;
     }
 
     simulate(){
-        this.simulationToggle = !this.simulationToggle;
+        this.simulationToggle = !this.simulationToggle;   
+        this.calcSimulation(); 
+    }
+
+    calcSimulation(){
         if (this.simulationToggle){
-            for (var i = 0; i < this.elements.length; i++){
-                this.elements[i].simulate();
+            for(var i=0;i<this.elements.length;i++){
+                // need an indicator endpoint to work back from
+                if( this.elements[i] instanceof Indicator){
+                    var indicator = this.elements[i];
+                    indicator.simulate(this.getState(this.elements[indicator.inputs[0].source[0]]));
+                }
             }
         }
+        this.draw();
+    }
+
+    save2Pallet(){
+
+        /// WIP
+        var outputs = [];
+        for(var i=0;i<this.elements.length;i++){
+            // need an indicator endpoint to work back from
+            if( this.elements[i] instanceof Indicator){
+                outputs.push(this.elements[i]);
+                this.createEquation(this.elements[outputs[outputs.length - 1].inputs[0].source[0]]);
+            }
+        }
+    }
+
+    deleteLineBtn(){
+        this.deleteLineFlag = ! this.deleteLineFlag;
     }
 
 }

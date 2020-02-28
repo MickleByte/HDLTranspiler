@@ -5,48 +5,54 @@ import Output from './output.js';
 export default class Transformer extends canvasObject{
     constructor(x, y, width, numInputs = 2, numOutputs = 1){
         super(x, y, width, width);
+        this.measure =  this.width / 10;   // define standard measure with which to construct the gate
+
+        // establish max and minimum locations for the main body of the transformer
+        this.maxBodyX = this.xPos + (this.measure * 7);
+        this.minBodyX = this.xPos + (this.measure * 3);
+        this.maxBodyY = this.yPos + (this.measure * 7);
+        this.minBodyY = this.yPos + (this.measure * 3);
+
         this.inputs = [];
         this.outputs = [];
 
-
+        var radiusOfIO = width / 40;
         var x, y;
         for (var i = 0; i < numInputs; i++){
-            [x, y] = this.calcIoPosition(i, true, numInputs)
-            this.inputs.push(new Input(x, y));
+            [x, y] = this.calcIoPosition(i, true, numInputs, radiusOfIO)
+            this.inputs.push(new Input(x, y, radiusOfIO));
         }
 
         for (var i = 0; i < numOutputs; i++){
-            [x, y] = this.calcIoPosition(i, false, numOutputs)
-            this.outputs.push(new Output(x, y));
+            [x, y] = this.calcIoPosition(i, false, numOutputs, radiusOfIO)
+            this.outputs.push(new Output(x, y, radiusOfIO));
         }
     }
 
     // calculates the x & y coordinates for input or output n. input will be true if the point in question is an input
-    calcIoPosition(childIndex, input, numNodes){
-        var widthOfNodes = 5;
+    calcIoPosition(childIndex, input, numNodes, widthOfNodes = 5){
         if (input){
-            var distanceBetween  = this.height / (numNodes + 1); //divide by number of inputs + 1 - at this stage we are always assuming it is 2
-            var x = this.xPos - widthOfNodes;
-            var y = this.yPos + (distanceBetween * (childIndex + 1));
+            var distanceBetween  = (this.measure * 4) / (numNodes + 1); //divide by number of inputs + 1 - at this stage we are always assuming it is 2
+            var x = this.minBodyX - (1.5 * this.measure);
+            var y = this.minBodyY + (distanceBetween * (childIndex + 1));
             return [x, y];
         }
         else{
-            var distanceBetween  = this.height / (numNodes + 1); //divide by number of outputs + 1 - at this stage we are always assuming it is 1
-            var x = this.xPos + this.width + widthOfNodes;
-            var y = this.yPos + (distanceBetween * (childIndex + 1));
+            var distanceBetween  = (this.measure * 4) / (numNodes + 1); //divide by number of outputs + 1 - at this stage we are always assuming it is 1
+            var x = this.maxBodyX + (3 * this.measure);
+            var y = this.minBodyY + (distanceBetween * (childIndex + 1));
             return [x, y];
         }     
     }
 
     draw(ctx, borderColour = "#000000"){
-        super.draw(ctx, borderColour);
         // draw all inputs to transformer
         for (var i = 0; i < this.inputs.length; i++){
-            this.inputs[i].draw(ctx);
+            this.inputs[i].draw(ctx, this.xPos, this.yPos);
         }
         // draw all outputs of transformer
         for (var i = 0; i < this.outputs.length; i++){
-            this.outputs[i].draw(ctx);
+            this.outputs[i].draw(ctx, this.xPos, this.yPos);
         }
     }
 
@@ -70,6 +76,10 @@ export default class Transformer extends canvasObject{
         for (var i = 0; i < this.outputs.length; i++){
             this.calcIoPosition(i, false, this.outputs.length);
         }
+        this.maxBodyX = this.xPos + (this.measure * 7);
+        this.minBodyX = this.xPos + (this.measure * 3);
+        this.maxBodyY = this.yPos + (this.measure * 7);
+        this.minBodyY = this.yPos + (this.measure * 3);
     }
 
     simulate(){
