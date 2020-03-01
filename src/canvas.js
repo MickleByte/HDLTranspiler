@@ -8,7 +8,9 @@ import Source from './source.js';
 import Menu from './menu.js';
 import Bin from './bin.js';
 import NAND from './NandGate.js';
-
+import NOR from './NorGate.js';
+import XNOR from './XnorGate.js';
+import CustomTrans from './customTransformer.js';
 
 export default class Canvas{
     constructor(ctx){
@@ -39,7 +41,7 @@ export default class Canvas{
         this.menu = new Menu(this.width, this.height, 0, 0);
 
         // creation of bin
-        this.bin = new Bin(this.width - this.scaleFactor, this.height - this.scaleFactor, this.scaleFactor);
+        this.bin = new Bin(this.width, this.height, this.width / 10);
         
 
         // call draw function
@@ -151,25 +153,36 @@ export default class Canvas{
             if (this.menu.menuItems[i].checkClick(xClick, yClick)){
                 switch(this.menu.menuItems[i].constructor) {
                     case AND:
-                        this.elements.push(new AND(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
+                        this.elements.push(new AND(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
                         break;
                     case NAND:
-                        this.elements.push(new NAND(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
+                        this.elements.push(new NAND(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
                         break;
                     case OR:
-                        this.elements.push(new OR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
+                        this.elements.push(new OR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
                       break;
                     case XOR:
-                        this.elements.push(new XOR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
+                        this.elements.push(new XOR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
+                        break;
+                    case NOR:
+                        this.elements.push(new NOR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
+                        break;
+                    case XNOR:
+                        this.elements.push(new XNOR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
                         break;
                     case Indicator:
-                        this.elements.push(new Indicator(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor, this.generateOutputName(this.currentNumberOfOutputs)));
+                        this.elements.push(new Indicator(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.generateOutputName(this.currentNumberOfOutputs)));
                         break;
                     case Source:
-                        this.elements.push(new Source(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor, this.generateInputName(this.currentNumberOfInputs)));
+                        this.elements.push(new Source(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.generateInputName(this.currentNumberOfInputs)));
                         break;
                     case NOT:
-                        this.elements.push(new NOT(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.scaleFactor));
+                        this.elements.push(new NOT(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
+                        break;
+
+
+                    case CustomTrans:
+                        this.elements.push(new CustomTrans(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.menu.menuItems[i].inputs.lenth, this.menu.menuItems[i].outputs.lenth, this.menu.menuItems[i].operator));
                         break;
                     default:
                       console.log("ERROR: Could not find class to make instance of")
@@ -209,34 +222,10 @@ export default class Canvas{
             if (this.deleteLineFlag){
                 // check if mouse move intersects one of the lines
 
-                for (var i = 0; i < this.elements.length; i++){
-                    for (var j = 0; j < this.elements[i].inputs.length; j++){
-                        if (this.elements[i].inputs[j].source != null){
-                            // var [x1, y1, x2, y2] = this.drawLineByID([i,j], this.elements[i].inputs[j].source);
-                            // var AdifX = (x2 - x1);
-                            // var AdifY = (y2 - y1);
-                            // var BdifX = (this.lastX - newX);
-                            // var BdifY = (this.lastY - newY);   
-                            // var LHS = [
-                            //     [x1 - this.lastX, AdifX, -BdifX],
-                            //     [y1 - this.lastY, AdifY, -BdifY]
-                            // ];
-                            // var RHS = [
-                            //     [0],
-                            //     [0]
-                            // ];
-                            // RHS[0][0] = -LHS[0][1];
-                            // LHS[0][1] = 0;
-
-                            // LHS[0] = LHS[0] / RHS[0][0];
-                            // RHS[0][0] = RHS[0][0] / RHS[0][0];
-                            
-
-                            // matrix[0][1] = 
-                            // console.log(matrix);
-                        }         
-                    }
-                }
+               var col = this.ctx.getImageData(newX, newY, 1, 1);
+               if (col.data[0] == 255 && col.data[1] == 255 && col.data[2] == 255){
+                   console.log("Black");
+               }
 
             }
             
@@ -266,7 +255,7 @@ export default class Canvas{
         for (var i = 0; i < this.elements.length; i++){
             if (this.elements[i].isDragging){
                 // if the mouse up has occured above the bin & was dragging an element, it should be deleted
-                if (this.bin.checkClick(this.elements[i].xPos, this.elements[i].yPos)){
+                if (this.bin.checkClick(this.elements[i].xPos + (this.elements[i].width / 2), this.elements[i].yPos + (this.elements[i].height / 2))){
                     this.elements.splice(i, 1);
                 }       
             }
@@ -368,7 +357,7 @@ export default class Canvas{
     }
 
     isOperator(node){
-        if (node instanceof AND || node instanceof OR || node instanceof XOR || node instanceof NOT){
+        if (!(node instanceof Source || node instanceof Indicator)){
             return true;
         }
         else{
@@ -406,7 +395,7 @@ export default class Canvas{
         return equation;
     }
 
-    performCheck(LHS, operator, RHS = false,){
+    performCheck(LHS, operator, RHS = false){
         if (operator == "&&"){
             if (LHS && RHS){
                 return true;
@@ -478,16 +467,22 @@ export default class Canvas{
     }
 
     save2Pallet(){
-
-        /// WIP
-        var outputs = [];
+        var numInputs = 0;
+        var numOutputs = 0;
+        var operator = "";
         for(var i=0;i<this.elements.length;i++){
             // need an indicator endpoint to work back from
             if( this.elements[i] instanceof Indicator){
-                outputs.push(this.elements[i]);
-                this.createEquation(this.elements[outputs[outputs.length - 1].inputs[0].source[0]]);
+                var indicator = this.elements[i];
+                numOutputs++;
+                operator = this.createEquation(this.elements[indicator.inputs[0].source[0]]);
+            }
+            else if(this.elements[i] instanceof Source){
+                numInputs++;
             }
         }
+        this.menu.menuItems.push(new CustomTrans(0, 0, this.width / 10, numInputs, numOutputs, operator));
+        this.draw();
     }
 
     deleteLineBtn(){

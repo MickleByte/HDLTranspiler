@@ -2,26 +2,35 @@ import canvasObject from './canvasObject.js';
 
 export default class Bin extends canvasObject{
     constructor(x, y, width){
-        super(x - width, y - width, width * 2, width * 2);
+        super(x - width, y - width, width, width);
     }
 
     draw(ctx){
-        super.draw(ctx);
-
-
+        var thickness = 1; // border thickness (in pixels)
+        ctx.fillStyle = "black"; // border colour
+        ctx.fillRect(this.xPos, this.yPos, this.xPos + this.width, this.yPos + this.height); // draw border
+        
+        ctx.fillStyle = "#FFFFFF"; // body colour
+        
+        
+        ctx.fillRect(this.xPos + thickness, this.yPos + thickness, this.xPos + this.width - (thickness * 2), this.yPos + this.height - (thickness * 2)); // draw border
+        
 
         ctx.fillStyle = "#000000";
-        var fontSize = this.height * 0.9;
-        var textHeight = (this.height - fontSize);
+        var fontSize = (this.height) * 0.9;
         fontSize = fontSize.toString();
-        var fontCommand = fontSize.concat("px Arial");
-        ctx.font = fontCommand;
+        ctx.font = fontSize.concat("px Arial");
 
-        var textWidth = ctx.measureText(this.nameLabel).width;
-        textWidth = (this.width - textWidth) / 2;
+        var textWidth = ctx.measureText("BIN").width;
+        while (textWidth > (this.xPos + this.width - this.xPos)){
+            fontSize--;
+            fontSize = fontSize.toString();
+            ctx.font = fontSize.concat("px Arial");
+            var textWidth = ctx.measureText("BIN").width;
+        }
 
-
-        ctx.fillText("BIN", this.xPos + textWidth, this.yPos + this.height - textHeight);   
+        // filltext(string to be written, x location, y location)
+        ctx.fillText("BIN", this.xPos, this.yPos + this.height);   
     }
 
     checkClick(x, y){

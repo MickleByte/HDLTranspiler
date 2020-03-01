@@ -1,10 +1,19 @@
 import Transformer from './transformer.js';
 
-export default class NAND extends Transformer{
+export default class NOR extends Transformer{
     constructor(x, y, width, nameLabel = ""){
         super(x, y, width, 2, 1);
-        this.operator = "~&";
-        this.nameLabel = "~&";
+        this.operator = "~||"
+        this.nameLabel = "~||"
+    }
+
+    updateState(){
+        if (this.currentStatus){
+            this.colour = "green";
+        }
+        else{
+            this.colour = "red";
+        }
     }
 
     simulate(){
@@ -14,18 +23,18 @@ export default class NAND extends Transformer{
     }
 
 
-    draw(ctx){
-
-        super.draw(ctx, 0, this.measure);
-
+    draw(ctx){          
+        super.draw(ctx, this.measure, this.measure);
 
         // drawing gate body
         ctx.fillStyle = "#fcba03"; // border colour
         
-        // left hand line
+        // left hand arc
         ctx.beginPath();
+        // (curve start x, start y)
         ctx.moveTo(this.minBodyX, this.minBodyY);
-        ctx.lineTo(this.minBodyX, this.maxBodyY);
+        // (control point x, control y, end x, end y)
+        ctx.quadraticCurveTo(this.minBodyX + (this.measure * 2), this.minBodyY + (this.measure * 2), this.minBodyX, this.maxBodyY);
         ctx.stroke();
 
         // top line
@@ -42,16 +51,16 @@ export default class NAND extends Transformer{
 
         // right hand arc
         ctx.beginPath();
-        // ctx.arc(x location, y location, size, arcStart location, arcEnd location) - leave last two as 1.5*pi and 0.5*pi
-        ctx.arc(this.maxBodyX - this.measure, this.maxBodyY - ( 2 * this.measure), this.measure * 2, 1.5 * Math.PI, 0.5 * Math.PI);
+        // (curve start x, start y)
+        ctx.moveTo(this.maxBodyX - this.measure, this.minBodyY);
+        // (control point x, control y, end x, end y)
+        ctx.quadraticCurveTo(this.maxBodyX + (this.measure * 3),  this.minBodyY + (this.measure * 2), this.maxBodyX - this.measure, this.maxBodyY);
         ctx.stroke();
-
 
         // inverter circle
         ctx.beginPath();
         // ctx.arc(x location, y location, size, arcStart location, arcEnd location)
         ctx.arc(this.maxBodyX + (this.measure * 1.5), this.maxBodyY - ( 2 * this.measure), this.measure / 2, 0 * Math.PI, 2 * Math.PI);
         ctx.stroke();
-        
     }
 }

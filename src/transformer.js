@@ -45,15 +45,20 @@ export default class Transformer extends canvasObject{
         }     
     }
 
-    draw(ctx, borderColour = "#000000"){
+    // parentX value can be used to start or finish the connecting line between IO and gate body but it is 0 by default
+    draw(ctx, inputParentX = 0, outputParentX = 0){
+        // change colour to blue for I/O
+        ctx.strokeStyle = "blue";
         // draw all inputs to transformer
         for (var i = 0; i < this.inputs.length; i++){
-            this.inputs[i].draw(ctx, this.xPos, this.yPos);
+            this.inputs[i].draw(ctx, this.inputs[i].xPos + (1.5 * this.measure) + inputParentX, this.inputs[i].yPos);
         }
         // draw all outputs of transformer
         for (var i = 0; i < this.outputs.length; i++){
-            this.outputs[i].draw(ctx, this.xPos, this.yPos);
+            this.outputs[i].draw(ctx, this.outputs[i].xPos - (2 * this.measure) + outputParentX, this.outputs[i].yPos);
         }
+        // change colour back to black
+        ctx.strokeStyle = "black";
     }
 
     translate(changeX, changeY){
@@ -65,6 +70,10 @@ export default class Transformer extends canvasObject{
         for (var i = 0; i < this.outputs.length; i++){
             this.outputs[i].translate(changeX, changeY);
         }
+        this.maxBodyX = this.xPos + (this.measure * 7);
+        this.minBodyX = this.xPos + (this.measure * 3);
+        this.maxBodyY = this.yPos + (this.measure * 7);
+        this.minBodyY = this.yPos + (this.measure * 3);
     }
 
     updatePosition(newX, newY){
@@ -88,5 +97,12 @@ export default class Transformer extends canvasObject{
         }
     }
 
+
+    checkClick(x, y){
+        if (x >= this.minBodyX && x <= this.maxBodyX && y >= this.minBodyY && y <= this.maxBodyY){
+            return true;
+        }
+        return false;
+    }
 
 }

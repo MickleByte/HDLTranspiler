@@ -2,20 +2,20 @@ import canvasObject from './canvasObject.js';
 
 export default class Input extends canvasObject{
     constructor(x, y, radius){
-        super(x, y, radius, radius);
+        super(x, y, radius * 2, radius * 2);
         this.source = null;
         this.currentState = false;
     }
 
     draw(ctx, parentX, parentY){
         ctx.beginPath();
-        ctx.arc(this.xPos, this.yPos, this.width * 2, 0, 2 * Math.PI);
+        ctx.arc(this.xPos, this.yPos, this.width, 0, 2 * Math.PI);
         ctx.stroke();
 
         // line connecting the output to its parent gate
         ctx.beginPath();
-        ctx.moveTo(this.xPos, this.yPos);
-        ctx.lineTo(parentX + this.width, parentY);
+        ctx.moveTo(this.xPos + this.width, this.yPos);
+        ctx.lineTo(parentX, parentY);
         ctx.stroke();
     }
 

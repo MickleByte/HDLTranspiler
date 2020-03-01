@@ -12,14 +12,51 @@
                 height: 100%;
                 margin: 0px;
             }
+
+            div{
+                padding:5px;
+            }
+
+            #simControls, #transControls{
+                display: inline-block;
+                margin:0 1% 0 1%;
+            }
+
+            #controls{
+                height: 50px;
+                text-align: center;
+                margin-left: auto;
+                margin-right:auto;
+                width: 90%;
+            }
+
+            body {
+                overflow-y: hidden; /* Hide vertical scrollbar */
+                overflow-x: hidden; /* Hide horizontal scrollbar */
+            }
+
+            /* Remove below style when want add to pallet and delete line btns back */
+            #addToPalletBtn, #deleteLine{
+                display: none;
+            }
+
         </style>     
         <canvas id="canvas" height="500" width="500" style="border:1px solid #000000;">
             This Browser Does Not Support HTML5 Canvas Element - Please Use A Different Web Browser
         </canvas>
-        <button id="simulateToggle">Start Simulation</button>
-        <button id="translateBtn">Translate To Verilog</button>
-        Module Name:
-        <input id="moduleNameField" type="text" name="moduleName">
+        <div id="controls">
+            <div id="simControls">
+                <button id="simulateToggle">Start Simulation</button><br>
+            </div>
+            
+            <div id="transControls">
+                Module Name:
+                <input id="moduleNameField" type="text" name="moduleName">
+                <button id="translateBtn">Translate To Verilog</button>
+            </div>
+        </div>
+        
+        
         <button id="addToPalletBtn">Add to Pallet</button>
         <button id="deleteLine">Delete Line</button>
         <script src="index.js" type="module"></script>

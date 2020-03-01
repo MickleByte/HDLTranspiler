@@ -24,35 +24,33 @@ export default class NOT extends Transformer{
 
 
     draw(ctx){
-        ctx.fillStyle = "#fcba03"; // border colour
-        
-        
+
+        super.draw(ctx);
+
+        ctx.fillStyle = "#fcba03"; // border colour         
         
         // left hand line
         ctx.beginPath();
-        ctx.moveTo(this.xPos, this.yPos);
-        ctx.lineTo(this.xPos, this.yPos + this.height);
+        ctx.moveTo(this.minBodyX, this.minBodyY);
+        ctx.lineTo(this.minBodyX, this.maxBodyY);
         ctx.stroke();
 
         // top line
         ctx.beginPath();
-        ctx.moveTo(this.xPos, this.yPos);
-        ctx.lineTo(this.xPos + this.width, this.yPos + (this.height / 2));
+        ctx.moveTo(this.minBodyX, this.minBodyY);
+        ctx.lineTo(this.maxBodyX, this.minBodyY + (this.measure * 2));
         ctx.stroke();
 
         // bottom line
         ctx.beginPath();
-        ctx.moveTo(this.xPos, this.yPos + this.height);
-        ctx.lineTo(this.xPos + this.width, this.yPos + (this.height / 2));
+        ctx.moveTo(this.minBodyX, this.maxBodyY);
+        ctx.lineTo(this.maxBodyX, this.minBodyY + (this.measure * 2));
         ctx.stroke();
 
-        // draw all inputs to transformer
-        for (var i = 0; i < this.inputs.length; i++){
-            this.inputs[i].draw(ctx);
-        }
-        // draw all outputs of transformer
-        for (var i = 0; i < this.outputs.length; i++){
-            this.outputs[i].draw(ctx);
-        }
+        // inverter circle
+        ctx.beginPath();
+        // ctx.arc(x location, y location, size, arcStart location, arcEnd location)
+        ctx.arc(this.maxBodyX + (this.measure * 0.5), this.maxBodyY - ( 2 * this.measure), this.measure / 2, 0 * Math.PI, 2 * Math.PI);
+        ctx.stroke();
     }
 }

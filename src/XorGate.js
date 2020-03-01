@@ -23,49 +23,46 @@ export default class XOR extends Transformer{
     }
 
 
-    draw(ctx){
+    draw(ctx){          
+        super.draw(ctx, this.measure);
+
+        // drawing gate body
         ctx.fillStyle = "#fcba03"; // border colour
         
-        
-        
+        // left hand arc (inner)
+        ctx.beginPath();
+        // (curve start x, start y)
+        ctx.moveTo(this.minBodyX, this.minBodyY);
+        // (control point x, control y, end x, end y)
+        ctx.quadraticCurveTo(this.minBodyX + (this.measure * 2), this.minBodyY + (this.measure * 2), this.minBodyX, this.maxBodyY);
+        ctx.stroke();
+
+        // left hand arc (outside)
+        ctx.beginPath();
+        // (curve start x, start y)
+        ctx.moveTo(this.minBodyX - this.measure, this.minBodyY);
+        // (control point x, control y, end x, end y)
+        ctx.quadraticCurveTo(this.minBodyX + (this.measure), this.minBodyY + (this.measure * 2), this.minBodyX - this.measure, this.maxBodyY);
+        ctx.stroke();
+
         // top line
         ctx.beginPath();
-        ctx.moveTo(this.xPos  - (this.width * 0.1), this.yPos);
-        ctx.lineTo(this.xPos + (this.width * 0.6), this.yPos);
+        ctx.moveTo(this.minBodyX, this.minBodyY);
+        ctx.lineTo(this.maxBodyX - this.measure, this.minBodyY);
         ctx.stroke();
 
         // bottom line
         ctx.beginPath();
-        ctx.moveTo(this.xPos  - (this.width * 0.1), this.yPos + this.height);
-        ctx.lineTo(this.xPos + (this.width * 0.6), this.yPos + this.height);
+        ctx.moveTo(this.minBodyX, this.maxBodyY);
+        ctx.lineTo(this.maxBodyX - this.measure, this.maxBodyY);
         ctx.stroke();
 
         // right hand arc
         ctx.beginPath();
-        ctx.moveTo(this.xPos + (this.width * 0.6), this.yPos);
-        ctx.quadraticCurveTo(this.xPos + (this.width * 1.4), this.yPos + (this.height * 0.5), this.xPos + (this.width * 0.6), this.yPos + this.height);
+        // (curve start x, start y)
+        ctx.moveTo(this.maxBodyX - this.measure, this.minBodyY);
+        // (control point x, control y, end x, end y)
+        ctx.quadraticCurveTo(this.maxBodyX + (this.measure * 3),  this.minBodyY + (this.measure * 2), this.maxBodyX - this.measure, this.maxBodyY);
         ctx.stroke();
-
-
-        // left hand arc
-        ctx.beginPath();
-        ctx.moveTo(this.xPos - (this.width * 0.1), this.yPos);
-        ctx.quadraticCurveTo(this.xPos + (this.width * 0.3), this.yPos + (this.height * 0.5), this.xPos - (this.width * 0.1), this.yPos + this.height);
-        ctx.stroke();
-
-        // left hand arc
-        ctx.beginPath();
-        ctx.moveTo(this.xPos - (this.width * 0.2), this.yPos);
-        ctx.quadraticCurveTo(this.xPos + (this.width * 0.3), this.yPos + (this.height * 0.5), this.xPos - (this.width * 0.2), this.yPos + this.height);
-        ctx.stroke();
-
-        // draw all inputs to transformer
-        for (var i = 0; i < this.inputs.length; i++){
-            this.inputs[i].draw(ctx);
-        }
-        // draw all outputs of transformer
-        for (var i = 0; i < this.outputs.length; i++){
-            this.outputs[i].draw(ctx);
-        }
     }
 }

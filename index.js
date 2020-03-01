@@ -9,7 +9,7 @@ var offsetX = canvElem.getBoundingClientRect().left;
 var offsetY = canvElem.getBoundingClientRect().top;
 var ctx = canvElem.getContext("2d");
 ctx.canvas.width  = window.innerWidth;
-ctx.canvas.height = window.innerHeight - 100;
+ctx.canvas.height = window.innerHeight - 60;
 
 
 var myString = "from file 1";
