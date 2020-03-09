@@ -17,15 +17,15 @@ export default class Menu{
         this.xPos = x;
         this.yPos = y;
         this.size = size;
-        this.menuItems.push(new NOT(x, y, size));
-        this.menuItems.push(new AND(x, y, size));
-        this.menuItems.push(new XOR(x, y, size));
-        this.menuItems.push(new OR(x, y, size));
-        this.menuItems.push(new XNOR(x, y, size));
-        this.menuItems.push(new NOR(x, y, size));
-        this.menuItems.push(new NAND(x, y, size));
         this.menuItems.push(new Source(x, y, size, "IN"));
-        this.menuItems.push(new Indicator(x, y, size, "OUT"));   
+        this.menuItems.push(new Indicator(x, y, size, "OUT"));
+        this.menuItems.push(new AND(x, y, size));
+        this.menuItems.push(new OR(x, y, size));
+        this.menuItems.push(new XOR(x, y, size));
+        this.menuItems.push(new NOT(x, y, size));
+        this.menuItems.push(new NAND(x, y, size));
+        this.menuItems.push(new NOR(x, y, size));   
+        this.menuItems.push(new XNOR(x, y, size));        
     }
 
     draw(ctx){

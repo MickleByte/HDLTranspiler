@@ -91,13 +91,6 @@ export default class Transformer extends canvasObject{
         this.minBodyY = this.yPos + (this.measure * 3);
     }
 
-    simulate(){
-        for (var i = 0; i < this.inputs.length; i++){
-            this.inputs[i].source[0] //???????
-        }
-    }
-
-
     checkClick(x, y){
         if (x >= this.minBodyX && x <= this.maxBodyX && y >= this.minBodyY && y <= this.maxBodyY){
             return true;

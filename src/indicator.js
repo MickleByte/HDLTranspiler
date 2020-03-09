@@ -10,7 +10,7 @@ export default class Indicator extends Transformer{
         if (currentStatus){
             this.colour = "green";
         }
-        else{
+        else if(!currentStatus){
             this.colour = "red";
         }
     }
