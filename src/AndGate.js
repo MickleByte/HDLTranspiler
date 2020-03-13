@@ -1,9 +1,8 @@
 import Transformer from './transformer.js';
 
 export default class AND extends Transformer{
-    constructor(x, y, width, nameLabel = ""){
+    constructor(x, y, width){
         super(x, y, width, 2, 1);
-        this.operator = "&&";
         this.nameLabel = "&&";
     }
 

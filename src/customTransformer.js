@@ -3,7 +3,6 @@ import Transformer from './transformer.js';
 export default class AND extends Transformer{
     constructor(x, y, width, numInputs, numOutputs, operation){
         super(x, y, width, numInputs, numOutputs);
-        this.operator = operation
         this.nameLabel = operation
     }
 

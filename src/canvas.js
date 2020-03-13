@@ -49,27 +49,36 @@ export default class Canvas{
     }
 
     Erase(){
+        // if the number of elements isn't 0 (there has not been nothing drawn yet)
         if (this.elements.length != 0){
+            // give user alert to make sure they want to delete
             var confirmation = confirm("Are you sure? This will delete your diagram");
             if (confirmation){
+                // clear elements arr
                 this.elements = [];
                 this.lines = [];
+                // and if the sim is currently running stop it
                 if (this.simulationToggle){
                     document.getElementById("simulateToggle").click()
                 }
+                // update UI
                 this.draw();
             }
         }     
     }
 
     generateInputName(id){
+        // input names will be generated in this list: A, B, C, D, E, F, G, AA, AB, AC, AD, ..., GA, GB, GC, GD, GE, GF, GG.
+        // this can be extended to have more possible names by either adding more letters to the array or by adding another division to get a 3 letter name
         var inputs = ["A", "B", "C", "D", "E", "F", "G"];
         var name = "";
         var counter = -1;
+        // get remainder from id / inputs.length
         while (id > inputs.length - 1){
             id = id - inputs.length;
             counter++;
         }
+        // index of counter is first letter
         if (counter != -1){
             name = name.concat(inputs[counter]);
         }  
@@ -79,16 +88,21 @@ export default class Canvas{
     }
 
     generateOutputName(id){
+        // all letters that there can be possible combinations of
+        // output names will be generated in this list: W, X, Y, Z, WW, WX, WY, WZ, XW, XX, XY, XZ, ..., ZY, ZZ.
         var outputs = ["W", "X", "Y", "Z"];
         var name = "";
         var counter = -1;
+        // id / outputs.length = counter, with the remainder being left in id
         while (id > outputs.length - 1){
             id = id - outputs.length;
             counter++;
         }
+        // concat the letter is at index counter
         if (counter != -1){
             name = name.concat(outputs[counter]);
         }  
+        // the next letter to be concat is the index of the remainder (id)
         name = name.concat(outputs[id]);
         this.currentNumberOfOutputs++;
         return name;
@@ -197,7 +211,7 @@ export default class Canvas{
                             this.elements.push(new NOT(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
                             break;
                         case CustomTrans:
-                            this.elements.push(new CustomTrans(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.menu.menuItems[i].inputs.lenth, this.menu.menuItems[i].outputs.lenth, this.menu.menuItems[i].operator));
+                            this.elements.push(new CustomTrans(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.menu.menuItems[i].inputs.lenth, this.menu.menuItems[i].outputs.lenth, this.menu.menuItems[i].nameLabel));
                             break;
                         default:
                         console.log("ERROR: Could not find class to make instance of")

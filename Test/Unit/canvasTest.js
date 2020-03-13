@@ -40,7 +40,7 @@ export default class CanvasTest{
         }
 
         testCount++;
-        if (this.testObject.height != this.windowHeight - 100){
+        if (this.testObject.height != this.windowHeight - 60){
             errors.push(testCount + ": canvas height is not correct")
             errorCount++;
         }
@@ -60,12 +60,6 @@ export default class CanvasTest{
         testCount++;
         if (this.testObject.drawingLine != false){
             errors.push(testCount + ": drawingLine incorrectly initialised")
-            errorCount++;
-        }
-
-        testCount++;
-        if (this.testObject.lineSource != [0, 0]){
-            errors.push(testCount + ": lineSource incorrectly initialised")
             errorCount++;
         }
 
