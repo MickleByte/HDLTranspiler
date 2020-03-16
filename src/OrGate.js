@@ -3,7 +3,6 @@ import Transformer from './transformer.js';
 export default class OR extends Transformer{
     constructor(x, y, width, nameLabel = ""){
         super(x, y, width, 2, 1);
-        this.operator = "||"
         this.nameLabel = "||"
     }
 
