@@ -4,6 +4,7 @@ var canvElem = document.getElementById("canvas");
 var simBtn = document.getElementById("simulateToggle");
 var transBtn = document.getElementById("translateBtn");
 var testBenchBtn = document.getElementById("testBenchBtn");
+var truthTblBtn = document.getElementById("genTruthTblBtn");
 var save2Pallet = document.getElementById("addToPalletBtn");
 var deleteLine = document.getElementById("deleteLine");
 var clearCanvBtn = document.getElementById("clearBtn");
@@ -101,6 +102,15 @@ window.onload = function(){
         command = command.concat(moduleName);
         command = command.concat(".vvp\"");
         alert(command);
+    };
+
+    truthTblBtn.onclick = function(){
+        if (simBtn.innerHTML == "Stop Simulation"){
+            simBtn.click();
+        }
+        var truthTable = myCanv.getTruthTable();
+        console.log(truthTable);
+        download(getModuleName() + "TruthTable.txt", truthTable);
     };
 
     save2Pallet.onclick = function(){

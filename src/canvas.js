@@ -124,6 +124,7 @@ export default class Canvas{
     }
 
     drawLineByID(endID, sourceID){
+        // the start of the line (source) can be found by getting the index that the output is pointing to
         var source = this.elements[sourceID[0]].outputs[sourceID[1]];
         var end = this.elements[endID[0]].inputs[endID[1]];
         var x1 = end.xPos;
@@ -168,6 +169,7 @@ export default class Canvas{
             // check if menuItem was clicked & if it was, make an instance of that item
             for (var i = 0; i < this.menu.menuItems.length; i++){
                 if (this.menu.menuItems[i].checkClick(xClick, yClick)){
+                    // need to choose the right constructor depending on which menu item was clicked
                     switch(this.menu.menuItems[i].constructor) {
                         case AND:
                             this.elements.push(new AND(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
@@ -177,7 +179,7 @@ export default class Canvas{
                             break;
                         case OR:
                             this.elements.push(new OR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
-                        break;
+                            break;
                         case XOR:
                             this.elements.push(new XOR(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width));
                             break;
@@ -200,7 +202,7 @@ export default class Canvas{
                             this.elements.push(new CustomTrans(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.menu.menuItems[i].inputs.lenth, this.menu.menuItems[i].outputs.lenth, this.menu.menuItems[i].operator));
                             break;
                         default:
-                        console.log("ERROR: Could not find class to make instance of")
+                            console.log("ERROR: Could not find class to make instance of")
                     }
                     this.elements[this.elements.length - 1].isDragging = true;
                 }
@@ -335,19 +337,26 @@ export default class Canvas{
 
     dblClick(mouseX, mouseY){
         for (var i = 0; i < this.elements.length; i++){
+            // if the element is a source or an indicator need to watch for double click as it can be renamed
             if (this.elements[i] instanceof Source || this.elements[i] instanceof Indicator){
+                // check the click of any sources or indicators
                 if (this.elements[i].checkClick(mouseX, mouseY)){
                     var txt;
+                    // give user prompt for renaming node
                     var txt1 = prompt("Rename Node:", this.elements[i].nameLabel);
+                    // if user leaves prompt empty
                     if (txt1 == null || txt1 == "") {
+                        // keep the name label the same
                         txt = this.elements[i].nameLabel;
                     } else {
+                        // update the name of the node
                         txt = txt1;
                     }
                     this.elements[i].nameLabel = txt;
                 }        
             }
         }
+        // update UI
         this.draw();
     }
 
@@ -617,16 +626,22 @@ export default class Canvas{
             if (rootNode.inputs[1] == null){
                 // if it only has 1 input (a NOT Gate)
                 if (!(rootNode.inputs[0].source == null)){
+                    // get the state of the input node
                     var LHS = this.getState(this.elements[rootNode.inputs[0].source[0]]);
                     signal = this.performCheck(LHS, rootNode.nameLabel);
                 }else{
+                    // this means there are no inputs to the gate
                     signal = null;
                 }
             }
             else{
                 if (!(rootNode.inputs[0].source == null || rootNode.inputs[1].source == null)){
+                    // get the state of the Left Hand Side
                     var LHS = this.getState(this.elements[rootNode.inputs[0].source[0]]);
+                    // get the state of the Right Hand Side
                     var RHS = this.getState(this.elements[rootNode.inputs[1].source[0]]);
+                    // pass the state of the Left and Right hand sides as well as the operator to the performCheck()
+                    // this will calculate the effect of the operator on the two signals and return a status for the rootNode
                     signal = this.performCheck(LHS, rootNode.nameLabel, RHS);
                 }else{
                     signal = null;
@@ -683,6 +698,132 @@ export default class Canvas{
 
     deleteLineBtn(){
         this.deleteLineFlag = ! this.deleteLineFlag;
+    }
+
+    getRowTruthTable(){
+        var row = "|"
+        var state = false;
+        for(var i=0;i<this.elements.length;i++){
+            // need an indicator endpoint to work back from
+            if( this.elements[i] instanceof Source){
+                row = row.concat();
+
+                state = this.elements[i].currentStatus
+                if (state == false){
+                    row = row.concat("  0");
+                }
+                else{
+                    row = row.concat("  1");
+                }
+                row = row.concat("  |");
+            }
+        }
+   
+        for(var i=0;i<this.elements.length;i++){
+            // need an indicator endpoint to work back from
+            if( this.elements[i] instanceof Indicator){
+                var indicator = this.elements[i];
+                // need to ensure it is attached to something
+                if (!(indicator.inputs[0].source == null)){
+                    // if it is attached to something, we can get it's state from the state of the input source
+                    state = this.getState(this.elements[indicator.inputs[0].source[0]])
+                    if (state == false){
+                        row = row.concat("  0  ");
+                    }
+                    else{
+                        row = row.concat("  1  ");
+                    }
+                    
+                    row = row.concat("|");
+                }          
+            }
+        }
+        return row;
+    }
+
+    getTruthTable(){
+        var truthTable = "|"
+        var header = ""
+        var numHeaders = 0;
+        // get an array of all of the inputs in the network
+        var listOfInputs = []
+        for(var i=0;i<this.elements.length;i++){
+            if (this.elements[i] instanceof Source){
+                listOfInputs.push(this.elements[i]);
+                this.elements[i].currentStatus = false;
+                header = this.elements[i].nameLabel
+                for (var j = 0; j < Math.floor((5 - header.length) / 2); j++){
+                    truthTable = truthTable.concat(" ");
+                }
+                
+                if (header.length > 5){
+                    header = header.substr(0, 5);
+                }
+                truthTable = truthTable.concat(header)
+                for (var j = 0; j < Math.ceil((5 - header.length) / 2); j++){
+                    truthTable = truthTable.concat(" ");
+                }
+                truthTable = truthTable.concat("|");
+                numHeaders++;               
+            }
+
+            
+
+        }
+
+        for(var i=0;i<this.elements.length;i++){
+            if (this.elements[i] instanceof Indicator){
+                header = this.elements[i].nameLabel
+                for (var j = 0; j < Math.floor((5 - header.length) / 2); j++){
+                    truthTable = truthTable.concat(" ");
+                }
+                
+                if (header > 5){
+                    header = header.substr(0, 5);
+                }
+                truthTable = truthTable.concat(header)
+                for (var j = 0; j < Math.ceil((5 - header.length) / 2); j++){
+                    truthTable = truthTable.concat(" ");
+                }
+                truthTable = truthTable.concat("|");
+                numHeaders++;         
+            }
+        }
+
+
+        truthTable = truthTable.concat("\n|")
+        for (var i = 0; i < numHeaders; i++){
+            truthTable = truthTable.concat("-----|");
+        }
+        truthTable = truthTable.concat("\n")
+
+        // get the gray array of length n bits where n is the number of inputs
+        var grayArrStr = this.generateGrayArr(listOfInputs.length)
+        var grayArrBool = []
+        for (var i = 0; i < grayArrStr.length; i++){
+            var grayRowBool = []
+            for (var j = 0; j < grayArrStr[i].length; j++){       
+                if (grayArrStr[i][j] == 0){
+                    grayRowBool.push(false);
+                }
+                else{
+                    grayRowBool.push(true);
+                }
+            }
+            grayArrBool.push(grayRowBool)
+        }
+
+        for (var i = 0; i < grayArrBool.length; i++){
+            for (var j = 0; j < grayArrBool[i].length; j++){
+                if (grayArrBool[i][j] != listOfInputs[j].currentStatus){
+                    listOfInputs[j].currentStatus = grayArrBool[i][j];
+                }
+            }
+            truthTable = truthTable.concat(this.getRowTruthTable())
+            truthTable = truthTable.concat("\n")
+        }
+
+        return truthTable.substring(0, truthTable.length - 1);
     }
 
 }
