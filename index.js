@@ -16,6 +16,11 @@ ctx.canvas.height = window.innerHeight - 60;
 
 var myCanv = new Canvas(ctx, offsetX, offsetY);
 
+// this function gets called every milisecond and advances the canvas' internal clock
+setInterval(function(){
+    myCanv.clockUpdate()
+}, 1);
+
 function download(filename, text) {
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));

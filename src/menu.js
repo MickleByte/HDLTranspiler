@@ -7,6 +7,7 @@ import Indicator from './indicator.js';
 import Source from './source.js';
 import XNOR from './XnorGate.js';
 import NOR from './NorGate.js';
+import Clock from './clock.js';
 
 export default class Menu{
     constructor(canvWidth, canvHeight, x, y){
@@ -25,7 +26,8 @@ export default class Menu{
         this.menuItems.push(new NOT(x, y, size));
         this.menuItems.push(new NAND(x, y, size));
         this.menuItems.push(new NOR(x, y, size));   
-        this.menuItems.push(new XNOR(x, y, size));        
+        this.menuItems.push(new XNOR(x, y, size));  
+        this.menuItems.push(new Clock(x, y, size, "Clock"));      
     }
 
     draw(ctx){

@@ -10,6 +10,7 @@ import Bin from './bin.js';
 import NAND from './NandGate.js';
 import NOR from './NorGate.js';
 import XNOR from './XnorGate.js';
+import Clock from './clock.js';
 import CustomTrans from './customTransformer.js';
 
 export default class Canvas{
@@ -31,7 +32,7 @@ export default class Canvas{
         // remembers if a line is currently being drawn and where it's being drawn from
         this.drawingLine = false;
         this.lineSource = [0, 0];
-
+        this.internalClock = 0;// this internal clock starts at 0, it is increased by 1 every milisecond by the function clockUpdate() which is called by an interval function in index.js
         this.deleteLineFlag = false;
         
         this.currentNumberOfInputs = 0;
@@ -60,6 +61,12 @@ export default class Canvas{
                 this.draw();
             }
         }     
+    }
+
+    generateClockName(id){
+        var name = "clk";
+        var id = this.generateInputName(id);
+        return name.concat(id);
     }
 
     generateInputName(id){
@@ -199,6 +206,9 @@ export default class Canvas{
                         case CustomTrans:
                             this.elements.push(new CustomTrans(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.menu.menuItems[i].inputs.lenth, this.menu.menuItems[i].outputs.lenth, this.menu.menuItems[i].operator));
                             break;
+                        case Clock:
+                            this.elements.push(new Clock(this.menu.menuItems[i].xPos, this.menu.menuItems[i].yPos, this.menu.menuItems[i].width, this.generateClockName(this.currentNumberOfInputs)));
+                            break;
                         default:
                         console.log("ERROR: Could not find class to make instance of")
                     }
@@ -335,7 +345,19 @@ export default class Canvas{
 
     dblClick(mouseX, mouseY){
         for (var i = 0; i < this.elements.length; i++){
-            if (this.elements[i] instanceof Source || this.elements[i] instanceof Indicator){
+            if (this.elements[i] instanceof Clock){
+                if (this.elements[i].checkClick(mouseX, mouseY)){
+                    var txt;
+                    var txt1 = prompt("Set clock speed (ms):", this.elements[i].clockSpeed);
+                    if (txt1 == null || txt1 == "") {
+                        txt = this.elements[i].nameLabel;
+                    } else {
+                        txt = txt1;
+                    }
+                    this.elements[i].clockSpeed = txt;
+                }
+            }
+            else if (this.elements[i] instanceof Source || this.elements[i] instanceof Indicator){
                 if (this.elements[i].checkClick(mouseX, mouseY)){
                     var txt;
                     var txt1 = prompt("Rename Node:", this.elements[i].nameLabel);
@@ -347,6 +369,8 @@ export default class Canvas{
                     this.elements[i].nameLabel = txt;
                 }        
             }
+            
+
         }
         this.draw();
     }
@@ -683,6 +707,21 @@ export default class Canvas{
 
     deleteLineBtn(){
         this.deleteLineFlag = ! this.deleteLineFlag;
+    }
+
+    clockUpdate(){
+        this.internalClock++;
+        if (this.simulationToggle){
+            for(var i=0;i<this.elements.length;i++){
+                if (this.elements[i] instanceof Clock){           
+                    if (this.internalClock % this.elements[i].clockSpeed == 0){
+                        this.elements[i].updateState();
+                        this.calcSimulation();
+                        this.draw();
+                    }
+                }
+            }
+        }
     }
 
 }
