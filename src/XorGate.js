@@ -17,6 +17,12 @@ export default class XOR extends Transformer{
     }
 
     simulate(){
+        if (this.inputs[0].currentStatus && this.inputs[1].currentStatus || !this.inputs[0].currentStatus && !this.inputs[1].currentStatus){
+            this.currentStatus = true;
+        }
+        else{
+            this.currentStatus = false;
+        }
         for (var i = 0; i < this.outputs.length; i++){
             this.outputs[i].currentStatus = this.currentStatus;
         }

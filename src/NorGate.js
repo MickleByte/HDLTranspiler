@@ -17,6 +17,12 @@ export default class NOR extends Transformer{
     }
 
     simulate(){
+        if (this.inputs[0].currentStatus  == true || this.inputs[1].currentStatus == true){
+            this.currentStatus = false;
+        }
+        else{
+            this.currentStatus = true;
+        }
         for (var i = 0; i < this.outputs.length; i++){
             this.outputs[i].currentStatus = this.currentStatus;
         }

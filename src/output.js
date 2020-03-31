@@ -4,6 +4,7 @@ export default class Output extends canvasObject{
     constructor(x, y, radius){
         super(x, y, radius * 2, radius * 2);
         this.currentStatus = false;
+        this.pointer = [];
     }
 
     draw(ctx, parentX, parentY){
@@ -30,6 +31,10 @@ export default class Output extends canvasObject{
             return true;
         }
         return false;
+    }
+
+    setOut([elmID, outputID]){
+        this.pointer.push([elmID, outputID]); 
     }
 
 }

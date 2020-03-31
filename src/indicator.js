@@ -4,14 +4,15 @@ export default class Indicator extends Transformer{
     constructor(x, y, width, nameLabel = ""){
         super(x, y, width, 1, 0);
         this.nameLabel = nameLabel;
+        this.currentStatus = false;
     }
 
     simulate(currentStatus){
-        if (currentStatus){
-            this.colour = "green";
+        if (this.inputs[0].currentStatus){
+            this.currentStatus = true;
         }
-        else if(!currentStatus){
-            this.colour = "red";
+        else{
+            this.currentStatus = false;
         }
     }
 
@@ -27,6 +28,12 @@ export default class Indicator extends Transformer{
 
 
         if (simToggle){
+            if (this.currentStatus){
+                this.colour = "green";
+            }
+            else{
+                this.colour = "red";
+            }
             ctx.fillStyle = this.colour; // body colour
         }
         else{

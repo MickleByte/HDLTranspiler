@@ -4,7 +4,7 @@ export default class Input extends canvasObject{
     constructor(x, y, radius){
         super(x, y, radius * 2, radius * 2);
         this.source = null;
-        this.currentState = false;
+        this.currentStatus = false;
     }
 
     draw(ctx, parentX, parentY){

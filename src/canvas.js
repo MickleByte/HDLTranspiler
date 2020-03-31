@@ -225,7 +225,6 @@ export default class Canvas{
                     }
                 }   
             }
-            this.calcSimulation(); 
         }      
         
     }
@@ -296,7 +295,8 @@ export default class Canvas{
             for (var i = 0; i < this.elements.length; i++){
                 for (var j = 0; j < this.elements[i].inputs.length; j++){
                     if (this.elements[i].inputs[j].checkClick(mouseX, mouseY)){
-                        this.elements[i].inputs[j].setSource(this.lineSource);
+                        this.elements[i].inputs[j].setSource(this.lineSource); // set input to point at a given output
+                        this.elements[this.lineSource[0]].outputs[this.lineSource[1]].setOut([i, j]); // set that output to also point at input i, j
                     }
                 }
             }
@@ -344,33 +344,35 @@ export default class Canvas{
 
 
     dblClick(mouseX, mouseY){
-        for (var i = 0; i < this.elements.length; i++){
-            if (this.elements[i] instanceof Clock){
-                if (this.elements[i].checkClick(mouseX, mouseY)){
-                    var txt;
-                    var txt1 = prompt("Set clock speed (ms):", this.elements[i].clockSpeed);
-                    if (txt1 == null || txt1 == "") {
-                        txt = this.elements[i].nameLabel;
-                    } else {
-                        txt = txt1;
+        if (!this.simulationToggle){
+            for (var i = 0; i < this.elements.length; i++){
+                if (this.elements[i] instanceof Clock){
+                    if (this.elements[i].checkClick(mouseX, mouseY)){
+                        var txt;
+                        var txt1 = prompt("Set clock speed (ms):", this.elements[i].clockSpeed);
+                        if (txt1 == null || txt1 == "") {
+                            txt = this.elements[i].nameLabel;
+                        } else {
+                            txt = txt1;
+                        }
+                        this.elements[i].clockSpeed = txt;
                     }
-                    this.elements[i].clockSpeed = txt;
                 }
+                else if (this.elements[i] instanceof Source || this.elements[i] instanceof Indicator){
+                    if (this.elements[i].checkClick(mouseX, mouseY)){
+                        var txt;
+                        var txt1 = prompt("Rename Node:", this.elements[i].nameLabel);
+                        if (txt1 == null || txt1 == "") {
+                            txt = this.elements[i].nameLabel;
+                        } else {
+                            txt = txt1;
+                        }
+                        this.elements[i].nameLabel = txt;
+                    }        
+                }
+                
+    
             }
-            else if (this.elements[i] instanceof Source || this.elements[i] instanceof Indicator){
-                if (this.elements[i].checkClick(mouseX, mouseY)){
-                    var txt;
-                    var txt1 = prompt("Rename Node:", this.elements[i].nameLabel);
-                    if (txt1 == null || txt1 == "") {
-                        txt = this.elements[i].nameLabel;
-                    } else {
-                        txt = txt1;
-                    }
-                    this.elements[i].nameLabel = txt;
-                }        
-            }
-            
-
         }
         this.draw();
     }
@@ -665,14 +667,14 @@ export default class Canvas{
 
     simulate(){
         this.simulationToggle = !this.simulationToggle;   
-        this.calcSimulation(); 
+        this.draw();
     }
 
     calcSimulation(){
         if (this.simulationToggle){
             for(var i=0;i<this.elements.length;i++){
                 // need an indicator endpoint to work back from
-                if( this.elements[i] instanceof Indicator){
+                if( this.elements[i] instanceof Source){
                     var indicator = this.elements[i];
                     indicator.colour = "red"; // need to set it at zero before we work out whether it is true or false
                     // need to ensure it is attached to something
@@ -684,6 +686,26 @@ export default class Canvas{
             }
         }
         this.draw();
+    }
+
+
+    calcSimulation2(){
+        for(var i=0;i<this.elements.length;i++){
+            // for a given node, we want to propogate it's current state forward to the input of it's child node
+            var parent = this.elements[i];
+            parent.simulate();
+            // go through each thing the output is pointing to
+            if (!(parent instanceof Indicator)){
+                for(var j = 0; j < parent.outputs[0].pointer.length; j++){
+                    // and get the index of the node & which input it's pointing to
+                    var index = parent.outputs[0].pointer[j]
+                    // set the status of the input to the child node as the same as the parent's corresponding output 
+                    var child = this.elements[index[0]].inputs[index[1]];
+                    child.currentStatus = parent.outputs[0].currentStatus;
+                }
+            }
+            
+        }
     }
 
     save2Pallet(){
@@ -716,11 +738,12 @@ export default class Canvas{
                 if (this.elements[i] instanceof Clock){           
                     if (this.internalClock % this.elements[i].clockSpeed == 0){
                         this.elements[i].updateState();
-                        this.calcSimulation();
                         this.draw();
                     }
                 }
             }
+            this.calcSimulation2();
+            this.draw();
         }
     }
 
