@@ -80,12 +80,15 @@ window.onload = function(){
         myCanv.simulate()
     };
     transBtn.onclick = function(){
-        
-        var moduleName = getModuleName()
-        var HDL = myCanv.translate2HDL(moduleName);
-        
-        download(moduleName + ".v", HDL);
-        
+        var moduleName = getModuleName();
+
+        if (myCanv.checkCycles()){
+            alert(moduleName + " is a sequential circuit and so cannot be automaticaly converted to Verilog")
+        }
+        else{
+            var HDL = myCanv.translate2HDL(moduleName);
+            download(moduleName + ".v", HDL);
+        }
     };
 
     testBenchBtn.onclick = function(){

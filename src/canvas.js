@@ -323,6 +323,14 @@ export default class Canvas{
                                 }
                             }
                         }                                     
+                        for (var k = 0; k < this.elements[j].outputs[0].pointer.length; k++){
+                            if (this.elements[j].outputs[0].pointer[k][0] == i){
+                                this.elements[j].outputs[0].pointer.splice(k, 1)
+                            }
+                            else if(this.elements[j].outputs[0].pointer[k][0] > i){
+                                this.elements[j].outputs[0].pointer[k][0]--;
+                            }
+                        }                                     
                     }
                     this.elements.splice(i, 1); // remove the element from the array
                 }       
@@ -550,7 +558,7 @@ export default class Canvas{
         HDL = HDL.concat("\n\nendmodule");
 
         console.log(HDL);
-        return HDL;
+        return HDL; 
     }
 
     isOperator(node){
@@ -592,102 +600,10 @@ export default class Canvas{
         return equation;
     }
 
-    performCheck(LHS, operator, RHS = false){
-        if (operator == "&&"){
-            if (LHS && RHS){
-                return true;
-            }
-            return false;
-        }
-        else if(operator == "||"){
-            if (LHS || RHS){
-                return true;
-            }
-            return false;
-        }
-        else if(operator == "^"){
-            if (LHS && RHS || !LHS && !RHS){
-                return false;
-            }
-            return true;
-        }
-        else if(operator == "~&"){
-            if (LHS && RHS){
-                return false;
-            }
-            return true;
-        }
-        else if(operator == "~||"){
-            if (LHS || RHS){
-                return false;
-            }
-            return true;
-        }
-        else if(operator == "~^"){
-            if (LHS && RHS || !LHS && !RHS){
-                return true;
-            }
-            return false;
-        }
-        else if(operator == "!"){
-            if (LHS){
-                return false;
-            }
-            return true;
-        }
-    }
-
-    getState(rootNode){
-        var signal = false;
-        if (!( rootNode instanceof Source)){
-            if (rootNode.inputs[1] == null){
-                // if it only has 1 input (a NOT Gate)
-                if (!(rootNode.inputs[0].source == null)){
-                    var LHS = this.getState(this.elements[rootNode.inputs[0].source[0]]);
-                    signal = this.performCheck(LHS, rootNode.nameLabel);
-                }else{
-                    signal = null;
-                }
-            }
-            else{
-                if (!(rootNode.inputs[0].source == null || rootNode.inputs[1].source == null)){
-                    var LHS = this.getState(this.elements[rootNode.inputs[0].source[0]]);
-                    var RHS = this.getState(this.elements[rootNode.inputs[1].source[0]]);
-                    signal = this.performCheck(LHS, rootNode.nameLabel, RHS);
-                }else{
-                    signal = null;
-                }       
-            }
-        }
-        else{
-            signal = rootNode.currentStatus;
-        }
-        return signal;
-    }
-
     simulate(){
         this.simulationToggle = !this.simulationToggle;   
         this.draw();
     }
-
-    calcSimulation(){
-        if (this.simulationToggle){
-            for(var i=0;i<this.elements.length;i++){
-                // need an indicator endpoint to work back from
-                if( this.elements[i] instanceof Source){
-                    var indicator = this.elements[i];
-                    indicator.colour = "red"; // need to set it at zero before we work out whether it is true or false
-                    // need to ensure it is attached to something
-                    if (!(indicator.inputs[0].source == null)){
-                        // if it is attached to something, we can get it's state from the state of the input source
-                        indicator.simulate(this.getState(this.elements[indicator.inputs[0].source[0]]));
-                    }          
-                }
-            }
-        }
-        this.draw();
-    }
-
 
     calcSimulation2(){
         for(var i=0;i<this.elements.length;i++){
@@ -745,6 +661,32 @@ export default class Canvas{
             this.calcSimulation2();
             this.draw();
         }
+    }
+
+    checkCycles(){
+        for(var i=0;i<this.elements.length;i++){
+            // need an indicator endpoint to work back from
+            if( this.elements[i] instanceof Indicator){
+                if (this.traverseNet(i)){
+                   return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    traverseNet(index, listVisited = []){
+        if (listVisited.includes(index)){
+            return true;
+        }
+        listVisited.push(index);
+        for (var i = 0; i < this.elements[index].inputs.length; i++){
+            if (this.traverseNet(this.elements[index].inputs[i].source[0], listVisited)){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
