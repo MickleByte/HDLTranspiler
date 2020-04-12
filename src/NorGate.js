@@ -29,8 +29,8 @@ export default class NOR extends Transformer{
     }
 
 
-    draw(ctx){          
-        super.draw(ctx, this.measure, this.measure);
+    draw(ctx, simToggle = false){          
+        super.draw(ctx, this.measure, this.measure, simToggle);
 
         // drawing gate body
         ctx.fillStyle = "#fcba03"; // border colour

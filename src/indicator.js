@@ -17,7 +17,7 @@ export default class Indicator extends Transformer{
     }
 
     draw(ctx, simToggle = false){
-        super.draw(ctx, this.measure);
+        super.draw(ctx, this.measure, 0, 0, simToggle);
 
 
         var thickness = 1; // border thickness (in pixels)

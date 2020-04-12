@@ -29,9 +29,9 @@ export default class NOT extends Transformer{
     }
 
 
-    draw(ctx){
+    draw(ctx, simToggle = false){
 
-        super.draw(ctx);
+        super.draw(ctx, 0, 0, simToggle);
 
         ctx.fillStyle = "#fcba03"; // border colour         
         

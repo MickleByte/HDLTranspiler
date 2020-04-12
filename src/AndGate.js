@@ -23,9 +23,9 @@ export default class AND extends Transformer{
 
 
 
-    draw(ctx){
+    draw(ctx, simToggle = false){
 
-        super.draw(ctx);
+        super.draw(ctx, 0, 0, simToggle);
 
 
         // drawing gate body

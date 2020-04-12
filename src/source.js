@@ -20,7 +20,7 @@ export default class Source extends Transformer{
 
 
     draw(ctx, simToggle = false){
-        super.draw(ctx, 0, -this.measure);
+        super.draw(ctx, 0, -this.measure, simToggle);
 
 
         var thickness = 1; // border thickness (in pixels)

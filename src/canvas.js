@@ -393,7 +393,7 @@ export default class Canvas{
                 if (this.elements[i] instanceof Clock){
                     if (this.elements[i].checkClick(mouseX, mouseY)){
                         var txt;
-                        var txt1 = prompt("Set clock speed (ms):", this.elements[i].clockSpeed);
+                        var txt1 = prompt("Set clock speed:", this.elements[i].clockSpeed);
                         if (txt1 == null || txt1 == "") {
                             txt = this.elements[i].nameLabel;
                         } else {

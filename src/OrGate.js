@@ -29,8 +29,8 @@ export default class OR extends Transformer{
     }
 
 
-    draw(ctx){          
-        super.draw(ctx, this.measure);
+    draw(ctx, simToggle = false){          
+        super.draw(ctx, this.measure, 0, simToggle);
 
         // drawing gate body
         ctx.fillStyle = "#fcba03"; // border colour

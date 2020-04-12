@@ -20,9 +20,9 @@ export default class NAND extends Transformer{
     }
 
 
-    draw(ctx){
+    draw(ctx, simToggle = false){
 
-        super.draw(ctx, 0, this.measure);
+        super.draw(ctx, 0, this.measure, simToggle);
 
 
         // drawing gate body

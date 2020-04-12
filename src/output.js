@@ -7,10 +7,22 @@ export default class Output extends canvasObject{
         this.pointer = [];
     }
 
-    draw(ctx, parentX, parentY){
+    draw(ctx, parentX, parentY, simToggle = false){
         
         ctx.beginPath();
         ctx.arc(this.xPos, this.yPos, this.width, 0, 2 * Math.PI);
+        
+        // if simulation is in progress we want to colour the outputs as green for True and red for False
+        if (simToggle){
+            if (this.currentStatus){
+                ctx.fillStyle = 'green';
+            }
+            else{
+                ctx.fillStyle = "red"
+            }
+            ctx.fill();
+        }
+
         ctx.stroke();
 
         // line connecting the output to its parent gate
@@ -18,6 +30,8 @@ export default class Output extends canvasObject{
         ctx.moveTo(this.xPos - this.width, this.yPos);
         ctx.lineTo(parentX, parentY);
         ctx.stroke();
+
+        
     }
 
     checkClick(x, y){
