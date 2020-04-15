@@ -746,7 +746,7 @@ export default class Canvas{
         }
         return false;
     }
-    
+
     getRowTruthTable(){
         var row = "|";
         var state = false;
@@ -765,6 +765,7 @@ export default class Canvas{
                 row = row.concat("  |");
             }
         }
+        this.calcSimulation2();
    
         for(var i=0;i<this.elements.length;i++){
             // need an indicator endpoint to work back from
@@ -773,7 +774,7 @@ export default class Canvas{
                 // need to ensure it is attached to something
                 if (!(indicator.inputs[0].source == null)){
                     // if it is attached to something, we can get it's state from the state of the input source
-                    state = this.getState(this.elements[indicator.inputs[0].source[0]])
+                    state = this.elements[indicator.inputs[0].source[0]].currentStatus;
                     if (state == false){
                         row = row.concat("  0  ");
                     }

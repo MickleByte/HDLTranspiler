@@ -13,7 +13,7 @@ var offsetX = canvElem.getBoundingClientRect().left;
 var offsetY = canvElem.getBoundingClientRect().top;
 var ctx = canvElem.getContext("2d");
 ctx.canvas.width  = window.innerWidth;
-ctx.canvas.height = window.innerHeight - 60;
+ctx.canvas.height = window.innerHeight - (window.innerHeight * 0.1);
 
 
 var myCanv = new Canvas(ctx, offsetX, offsetY);
