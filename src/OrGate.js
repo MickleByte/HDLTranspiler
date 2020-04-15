@@ -16,14 +16,20 @@ export default class OR extends Transformer{
     }
 
     simulate(){
+        if (this.inputs[0].currentStatus  == true || this.inputs[1].currentStatus == true){
+            this.currentStatus = true;
+        }
+        else{
+            this.currentStatus = false;
+        }
         for (var i = 0; i < this.outputs.length; i++){
             this.outputs[i].currentStatus = this.currentStatus;
         }
     }
 
 
-    draw(ctx){          
-        super.draw(ctx, this.measure);
+    draw(ctx, simToggle = false){          
+        super.draw(ctx, this.measure, 0, simToggle);
 
         // drawing gate body
         ctx.fillStyle = "#fcba03"; // border colour

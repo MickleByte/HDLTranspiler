@@ -3,19 +3,13 @@ import Transformer from './transformer.js';
 export default class Source extends Transformer{
     constructor(x, y, width, nameLabel = ""){
         super(x, y, width, 0, 1);
-        this.currentStatus = true;
+        this.currentStatus = false;
         this.nameLabel = nameLabel;
         this.updateState();
     }
 
     updateState(){
         this.currentStatus = !this.currentStatus;
-        if (this.currentStatus){
-            this.colour = "green";
-        }
-        else{
-            this.colour = "red";
-        }
     }
 
     simulate(){
@@ -26,7 +20,7 @@ export default class Source extends Transformer{
 
 
     draw(ctx, simToggle = false){
-        super.draw(ctx, 0, -this.measure);
+        super.draw(ctx, 0, -this.measure, simToggle);
 
 
         var thickness = 1; // border thickness (in pixels)
@@ -37,6 +31,12 @@ export default class Source extends Transformer{
 
 
         if (simToggle){
+            if (this.currentStatus){
+                this.colour = "green";
+            }
+            else{
+                this.colour = "red";
+            }
             ctx.fillStyle = this.colour; // body colour
         }
         else{

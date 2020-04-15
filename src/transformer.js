@@ -73,16 +73,16 @@ export default class Transformer extends canvasObject{
     }
 
     // parentX value can be used to start or finish the connecting line between IO and gate body but it is 0 by default
-    draw(ctx, inputParentX = 0, outputParentX = 0){
+    draw(ctx, inputParentX = 0, outputParentX = 0, simToggle = false){
         // change colour to blue for I/O
         ctx.strokeStyle = "blue";
         // draw all inputs to transformer
         for (var i = 0; i < this.inputs.length; i++){
-            this.inputs[i].draw(ctx, this.inputs[i].xPos + (1.5 * this.measure) + inputParentX, this.inputs[i].yPos);
+            this.inputs[i].draw(ctx, this.inputs[i].xPos + (1.5 * this.measure) + inputParentX, this.inputs[i].yPos, simToggle);
         }
         // draw all outputs of transformer
         for (var i = 0; i < this.outputs.length; i++){
-            this.outputs[i].draw(ctx, this.outputs[i].xPos - (2 * this.measure) + outputParentX, this.outputs[i].yPos);
+            this.outputs[i].draw(ctx, this.outputs[i].xPos - (2 * this.measure) + outputParentX, this.outputs[i].yPos, simToggle);
         }
         // change colour back to black
         ctx.strokeStyle = "black";
