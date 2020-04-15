@@ -18,10 +18,10 @@ export default class XOR extends Transformer{
 
     simulate(){
         if (this.inputs[0].currentStatus && this.inputs[1].currentStatus || !this.inputs[0].currentStatus && !this.inputs[1].currentStatus){
-            this.currentStatus = true;
+            this.currentStatus = false;
         }
         else{
-            this.currentStatus = false;
+            this.currentStatus = true;
         }
         for (var i = 0; i < this.outputs.length; i++){
             this.outputs[i].currentStatus = this.currentStatus;
@@ -30,7 +30,7 @@ export default class XOR extends Transformer{
 
 
     draw(ctx, simToggle = false){          
-        super.draw(ctx, this.measure, simToggle);
+        super.draw(ctx, this.measure, 0, simToggle);
 
         // drawing gate body
         ctx.fillStyle = "#fcba03"; // border colour
