@@ -4,6 +4,7 @@ var canvElem = document.getElementById("canvas");
 var simBtn = document.getElementById("simulateToggle");
 var transBtn = document.getElementById("translateBtn");
 var testBenchBtn = document.getElementById("testBenchBtn");
+var helpBtn  = document.getElementById("helpBtn")
 var save2Pallet = document.getElementById("addToPalletBtn");
 var deleteLine = document.getElementById("deleteLine");
 var clearCanvBtn = document.getElementById("clearBtn");
@@ -113,6 +114,11 @@ window.onload = function(){
 
     save2Pallet.onclick = function(){
         myCanv.save2Pallet();
+    }
+
+    helpBtn.onclick = function(){
+        var helpMessage = "Drag components from the menu onto the canvas\n\nDouble clicking inputs in draw mode allows you to rename them or alter their clock speed\n\nClicking an input in simulation mode lets you flip it's state\n\nIn simulation mode Red nodes are false and green nodes are true";
+        alert(helpMessage);
     }
 }
 
