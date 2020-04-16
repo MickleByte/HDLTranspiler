@@ -62,4 +62,16 @@ export default class Source extends Transformer{
         // filltext(string to be written, x location, y location)
         ctx.fillText(this.nameLabel, this.minBodyX, this.maxBodyY - (this.measure * 0.5));   
     }
+
+    setName(){
+        var txt;
+        var txt1 = prompt("Rename Node:", this.nameLabel);
+        if (txt1 == null || txt1 == "") {
+            txt = this.nameLabel;
+        } else {
+            txt = txt1;
+        }
+        this.nameLabel = txt;
+    }   
+
 }
