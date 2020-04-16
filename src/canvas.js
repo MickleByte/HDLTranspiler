@@ -735,12 +735,13 @@ export default class Canvas{
 
 
     traverseNet(index, listVisited = []){
+        let listVis = Object.assign([], listVisited);
         if (listVisited.includes(index)){
             return true;
         }
-        listVisited.push(index);
+        listVis.push(index);
         for (var i = 0; i < this.elements[index].inputs.length; i++){
-            if (this.traverseNet(this.elements[index].inputs[i].source[0], listVisited)){
+            if (this.traverseNet(this.elements[index].inputs[i].source[0], listVis)){
                 return true;
             }
         }
