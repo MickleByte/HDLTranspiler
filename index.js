@@ -114,12 +114,20 @@ window.onload = function(){
     };
 
     truthTblBtn.onclick = function(){
+        var newWindow = window.open();
         if (simBtn.innerHTML == "Stop Simulation"){
             simBtn.click();
         }
         var truthTable = myCanv.getTruthTable();
+        var newWindowContent = "<title>";
+        newWindowContent += getModuleName();
+
+        
+
+        newWindowContent = newWindowContent.concat(" Truth Table</title><style>table, td, th {border: 1px solid black;}th, td { text-align: center;} table{width:50%; margin-left:auto; margin-right:auto;}</style>");
         console.log(truthTable);
-        download(getModuleName() + "TruthTable.txt", truthTable);
+        newWindowContent = newWindowContent.concat(truthTable);
+        newWindow.document.write(newWindowContent);
     };
 
     save2Pallet.onclick = function(){

@@ -745,24 +745,27 @@ export default class Canvas{
     }
 
     getRowTruthTable(){
-        var row = "|";
+        var row = "";
         var state = false;
         for(var i=0;i<this.elements.length;i++){
             // need an indicator endpoint to work back from
             if( this.elements[i] instanceof Source){
-                row = row.concat();
-
+                row = row.concat("<td>");
                 state = this.elements[i].currentStatus
                 if (state == false){
-                    row = row.concat("  0");
+                    row = row.concat("0");
                 }
                 else{
-                    row = row.concat("  1");
+                    row = row.concat("1");
                 }
-                row = row.concat("  |");
+                row = row.concat("</td>");
             }
         }
-        this.calcSimulation2();
+        for (var i = 0; i < this.elements.length; i++){
+            // may need to call this function as many times as there are elements to ensure the changes have propogated the whole network
+            this.calcSimulation2();
+        }
+        
    
         for(var i=0;i<this.elements.length;i++){
             // need an indicator endpoint to work back from
@@ -772,14 +775,15 @@ export default class Canvas{
                 if (!(indicator.inputs[0].source == null)){
                     // if it is attached to something, we can get it's state from the state of the input source
                     state = this.elements[indicator.inputs[0].source[0]].currentStatus;
+                    row = row.concat("<td>")
                     if (state == false){
-                        row = row.concat("  0  ");
+                        row = row.concat("0");
                     }
                     else{
-                        row = row.concat("  1  ");
+                        row = row.concat("1");
                     }
                     
-                    row = row.concat("|");
+                    row = row.concat("</td>");
                 }          
             }
         }
@@ -787,60 +791,32 @@ export default class Canvas{
     }
 
     getTruthTable(){
-        var truthTable = "|"
-        var header = ""
+        var truthTable = "<table>"
         var numHeaders = 0;
         // get an array of all of the inputs in the network
         var listOfInputs = []
+        truthTable = truthTable.concat("<tr>")
         for(var i=0;i<this.elements.length;i++){
             if (this.elements[i] instanceof Source){
+                truthTable = truthTable.concat("<th>");
                 listOfInputs.push(this.elements[i]);
-                this.elements[i].currentStatus = false;
-                header = this.elements[i].nameLabel
-                for (var j = 0; j < Math.floor((5 - header.length) / 2); j++){
-                    truthTable = truthTable.concat(" ");
-                }
-                
-                if (header.length > 5){
-                    header = header.substr(0, 5);
-                }
-                truthTable = truthTable.concat(header)
-                for (var j = 0; j < Math.ceil((5 - header.length) / 2); j++){
-                    truthTable = truthTable.concat(" ");
-                }
-                truthTable = truthTable.concat("|");
+                this.elements[i].currentStatus = false;   
+                truthTable = truthTable.concat(this.elements[i].nameLabel)
+                truthTable = truthTable.concat("</th>");
                 numHeaders++;               
             }
-
-            
-
         }
 
         for(var i=0;i<this.elements.length;i++){
             if (this.elements[i] instanceof Indicator){
-                header = this.elements[i].nameLabel
-                for (var j = 0; j < Math.floor((5 - header.length) / 2); j++){
-                    truthTable = truthTable.concat(" ");
-                }
-                
-                if (header > 5){
-                    header = header.substr(0, 5);
-                }
-                truthTable = truthTable.concat(header)
-                for (var j = 0; j < Math.ceil((5 - header.length) / 2); j++){
-                    truthTable = truthTable.concat(" ");
-                }
-                truthTable = truthTable.concat("|");
+                truthTable = truthTable.concat("<th>");
+                truthTable = truthTable.concat(this.elements[i].nameLabel);
+                truthTable = truthTable.concat("</th>");
                 numHeaders++;         
             }
         }
 
-
-        truthTable = truthTable.concat("\n|")
-        for (var i = 0; i < numHeaders; i++){
-            truthTable = truthTable.concat("-----|");
-        }
-        truthTable = truthTable.concat("\n")
+        truthTable = truthTable.concat("</tr>")
 
         // get the gray array of length n bits where n is the number of inputs
         var grayArrStr = this.generateGrayArr(listOfInputs.length)
@@ -864,11 +840,12 @@ export default class Canvas{
                     listOfInputs[j].currentStatus = grayArrBool[i][j];
                 }
             }
+            truthTable = truthTable.concat("<tr>");
             truthTable = truthTable.concat(this.getRowTruthTable())
-            truthTable = truthTable.concat("\n")
+            truthTable = truthTable.concat("</tr>");
         }
-
-        return truthTable.substring(0, truthTable.length - 1);
+        truthTable = truthTable.concat("</table>")
+        return truthTable;
     }
 
 }
