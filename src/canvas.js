@@ -848,4 +848,13 @@ export default class Canvas{
         return truthTable;
     }
 
+
+    getSaveData(){
+        var data = "";
+        for (var i = 0; i < this.elements.length; i++){
+            data = data.concat(this.elements[i]);
+        }
+        return data;
+    }
+
 }
