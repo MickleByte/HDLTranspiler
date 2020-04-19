@@ -7,15 +7,21 @@ export default class NAND extends Transformer{
     }
 
     simulate(){
+        if (this.inputs[0].currentStatus  == true && this.inputs[1].currentStatus == true){
+            this.currentStatus = false;
+        }
+        else{
+            this.currentStatus = true;
+        }
         for (var i = 0; i < this.outputs.length; i++){
             this.outputs[i].currentStatus = this.currentStatus;
         }
     }
 
 
-    draw(ctx){
+    draw(ctx, simToggle = false){
 
-        super.draw(ctx, 0, this.measure);
+        super.draw(ctx, 0, this.measure, simToggle);
 
 
         // drawing gate body

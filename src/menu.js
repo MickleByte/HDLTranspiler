@@ -7,6 +7,7 @@ import Indicator from './indicator.js';
 import Source from './source.js';
 import XNOR from './XnorGate.js';
 import NOR from './NorGate.js';
+import Clock from './clock.js';
 
 export default class Menu{
     constructor(canvWidth, canvHeight, x, y){
@@ -25,26 +26,54 @@ export default class Menu{
         this.menuItems.push(new NOT(x, y, size));
         this.menuItems.push(new NAND(x, y, size));
         this.menuItems.push(new NOR(x, y, size));   
-        this.menuItems.push(new XNOR(x, y, size));        
+        this.menuItems.push(new XNOR(x, y, size));  
+        this.menuItems.push(new Clock(x, y, size, "Clock"));      
+
+        this.menuLabels = ["Input", "Output", "AND", "OR", "XOR", "NOT", "NAND", "NOR", "XNOR", "Clock In"];
     }
 
     draw(ctx){
         ctx.fillStyle = "#000000"
-        // draw line across top
+        // draw line across top of screen
         var heightMenuItems = this.size;
         ctx.beginPath();
         ctx.moveTo(this.xPos, this.yPos + heightMenuItems);
         ctx.lineTo(this.xPos + this.canvWidth, this.yPos + heightMenuItems);
         ctx.stroke();
 
+        // divide width of screen into boxes for each menu item
         var widthMenuItems = this.canvWidth / this.menuItems.length;
+
+        // draw the menu items
         for(var i=0;i<this.menuItems.length;i++){
             ctx.beginPath();
             ctx.moveTo((i) * widthMenuItems, 0);
             ctx.lineTo((i) * widthMenuItems, heightMenuItems);
             ctx.stroke();
-            this.menuItems[i].updatePosition(this.xPos + (i * widthMenuItems) + (widthMenuItems / 2) - (this.menuItems[i].width / 2), this.yPos + (heightMenuItems / 2) - (this.menuItems[i].height / 2));
+            var x = this.xPos + (i * widthMenuItems) + (widthMenuItems / 2) - (this.menuItems[i].width / 2);
+            var y = this.yPos + (heightMenuItems / 2) - (this.menuItems[i].height / 2);
+            this.menuItems[i].updatePosition(x, y);
             this.menuItems[i].draw(ctx);
+
+            // write menu item name label beneath it
+            ctx.fillStyle = "#000000";
+            var fontSize = heightMenuItems * 0.9;
+            fontSize = fontSize.toString();
+            ctx.font = fontSize.concat("px Arial");
+    
+            var textWidth = ctx.measureText(this.nameLabel).width;
+            while (textWidth > widthMenuItems){
+                fontSize--;
+                fontSize = fontSize.toString();
+                ctx.font = fontSize.concat("px Arial");
+                var textWidth = ctx.measureText(this.nameLabel).width;
+            }
+    
+            ctx.textAlign = "center";
+            ctx.fillText(this.menuLabels[i], this.xPos + (i * widthMenuItems) + (widthMenuItems / 2), y + heightMenuItems);  
+            ctx.textAlign = "left";
+
+
         }
     }
 

@@ -4,25 +4,32 @@ export default class Indicator extends Transformer{
     constructor(x, y, width, nameLabel = ""){
         super(x, y, width, 1, 0);
         this.nameLabel = nameLabel;
+        this.currentStatus = false;
     }
 
     simulate(currentStatus){
-        if (currentStatus){
-            this.colour = "green";
+        if (this.inputs[0].currentStatus){
+            this.currentStatus = true;
         }
-        else if(!currentStatus){
-            this.colour = "red";
+        else{
+            this.currentStatus = false;
         }
     }
 
     draw(ctx, simToggle = false){
-        super.draw(ctx, this.measure);
+        super.draw(ctx, this.measure, 0, simToggle);
 
         var thickness = 1; // border thickness (in pixels)
         ctx.fillStyle = "black"; // border colour
         ctx.fillRect(this.minBodyX, this.minBodyY, this.maxBodyX - this.minBodyX, this.maxBodyY - this.minBodyY); // draw border
 
         if (simToggle){
+            if (this.currentStatus){
+                this.colour = "green";
+            }
+            else{
+                this.colour = "red";
+            }
             ctx.fillStyle = this.colour; // body colour
         }
         else{
@@ -46,5 +53,16 @@ export default class Indicator extends Transformer{
 
         // filltext(string to be written, x location, y location)
         ctx.fillText(this.nameLabel, this.minBodyX, this.maxBodyY - (this.measure * 0.5));   
+    }
+
+    setName(){
+        var txt;
+        var txt1 = prompt("Rename Node:", this.nameLabel);
+        if (txt1 == null || txt1 == "") {
+            txt = this.nameLabel;
+        } else {
+            txt = txt1;
+        }
+        this.nameLabel = txt;
     }
 }

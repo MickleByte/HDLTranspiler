@@ -8,15 +8,23 @@ export default class AND extends Transformer{
 
 
     simulate(){
+        if (this.inputs[0].currentStatus  == true && this.inputs[1].currentStatus == true){
+            this.currentStatus = true;
+        }
+        else{
+            this.currentStatus = false;
+        }
         for (var i = 0; i < this.outputs.length; i++){
             this.outputs[i].currentStatus = this.currentStatus;
         }
     }
 
 
-    draw(ctx){
 
-        super.draw(ctx);
+
+    draw(ctx, simToggle = false){
+
+        super.draw(ctx, 0, 0, simToggle);
 
 
         // drawing gate body

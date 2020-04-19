@@ -4,6 +4,7 @@ var canvElem = document.getElementById("canvas");
 var simBtn = document.getElementById("simulateToggle");
 var transBtn = document.getElementById("translateBtn");
 var testBenchBtn = document.getElementById("testBenchBtn");
+var helpBtn  = document.getElementById("helpBtn")
 var truthTblBtn = document.getElementById("genTruthTblBtn");
 var save2Pallet = document.getElementById("addToPalletBtn");
 var deleteLine = document.getElementById("deleteLine");
@@ -12,10 +13,15 @@ var offsetX = canvElem.getBoundingClientRect().left;
 var offsetY = canvElem.getBoundingClientRect().top;
 var ctx = canvElem.getContext("2d");
 ctx.canvas.width  = window.innerWidth;
-ctx.canvas.height = window.innerHeight - 60;
+ctx.canvas.height = window.innerHeight - (window.innerHeight * 0.1);
 
 
 var myCanv = new Canvas(ctx, offsetX, offsetY);
+
+// this function gets called every milisecond and advances the canvas' internal clock
+setInterval(function(){
+    myCanv.clockUpdate()
+}, 1);
 
 function download(filename, text) {
     var element = document.createElement('a');
@@ -76,12 +82,15 @@ window.onload = function(){
         myCanv.simulate()
     };
     transBtn.onclick = function(){
-        
-        var moduleName = getModuleName()
-        var HDL = myCanv.translate2HDL(moduleName);
-        
-        download(moduleName + ".v", HDL);
-        
+        var moduleName = getModuleName();
+
+        if (myCanv.checkCycles()){
+            alert(moduleName + " is a sequential circuit and so cannot be automaticaly converted to Verilog")
+        }
+        else{
+            var HDL = myCanv.translate2HDL(moduleName);
+            download(moduleName + ".v", HDL);
+        }
     };
 
     testBenchBtn.onclick = function(){
@@ -105,16 +114,29 @@ window.onload = function(){
     };
 
     truthTblBtn.onclick = function(){
+        var newWindow = window.open();
         if (simBtn.innerHTML == "Stop Simulation"){
             simBtn.click();
         }
         var truthTable = myCanv.getTruthTable();
+        var newWindowContent = "<title>";
+        newWindowContent += getModuleName();
+
+        
+
+        newWindowContent = newWindowContent.concat(" Truth Table</title><style>table, td, th {border: 1px solid black;}th, td { text-align: center;} table{width:50%; margin-left:auto; margin-right:auto;}</style>");
         console.log(truthTable);
-        download(getModuleName() + "TruthTable.txt", truthTable);
+        newWindowContent = newWindowContent.concat(truthTable);
+        newWindow.document.write(newWindowContent);
     };
 
     save2Pallet.onclick = function(){
         myCanv.save2Pallet();
+    }
+
+    helpBtn.onclick = function(){
+        var helpMessage = "Drag components from the menu onto the canvas\n\nDouble clicking inputs in draw mode allows you to rename them or alter their clock speed\n\nClicking an input in simulation mode lets you flip it's state\n\nIn simulation mode Red nodes are false and green nodes are true";
+        alert(helpMessage);
     }
 }
 

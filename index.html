@@ -23,11 +23,13 @@
             }
 
             #controls{
-                height: 50px;
+                height: 10%;
                 text-align: center;
                 margin-left: auto;
                 margin-right:auto;
                 width: 90%;
+                overflow-y: auto;
+                overflow-x: hidden;
             }
 
             body {
@@ -44,8 +46,10 @@
         <canvas id="canvas" height="500" width="500" style="border:1px solid #000000;">
             This Browser Does Not Support HTML5 Canvas Element - Please Use A Different Web Browser
         </canvas>
+       
         <div id="controls">
             <div id="simControls">
+                <button id="helpBtn">Help</button>
                 <button id="clearBtn">Clear Canvas</button>
                 <button id="simulateToggle">Start Simulation</button>
             </div>
