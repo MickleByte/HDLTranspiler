@@ -22,5 +22,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-2
 
+      - name: List files in directory
+        run: ls -la ./
+
       - name: Sync build directory to S3
-        run: aws s3 sync / s3://hdl-transpiler/ --delete 
+        run: aws s3 sync ./ s3://hdl-transpiler/ --delete 
